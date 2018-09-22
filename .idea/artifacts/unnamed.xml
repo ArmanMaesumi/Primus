@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="javafx-preloader" name="unnamed">
+    <output-path>$PROJECT_DIR$/out/artifacts/unnamed</output-path>
+    <properties id="javafx-preloader-properties">
+      <options>
+        <option name="preloaderClass" value="console.FirstPreloader" />
+      </options>
+    </properties>
+    <root id="archive" name="unnamed.jar" />
+  </artifact>
+</component>
