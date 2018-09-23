@@ -8,6 +8,10 @@ import java.math.BigInteger;
  */
 public final class BigFunctions
 {
+    public static boolean isIntegerValue(BigDecimal bd) {
+        return bd.signum() == 0 || bd.scale() <= 0 || bd.stripTrailingZeros().scale() <= 0;
+    }
+
     public static BigDecimal intPower(BigDecimal x, long exponent,
                                       int scale)
     {

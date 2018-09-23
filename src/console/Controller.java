@@ -4,10 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -24,7 +21,10 @@ public class Controller {
     public TextField textField;
     @FXML
     public MenuItem menuScriptEditor;
+    @FXML
     public Button Enter;
+    @FXML
+    public CheckMenuItem menuDegrees;
 
     public void enterButtonClicked() {
         boolean testing = false;
@@ -40,8 +40,10 @@ public class Controller {
                 String ret = ExecuteCommand.send(command, false);
                 textArea.appendText(">" + textField.getText() + "\n");
                 textField.setText("");
-                if (!PrimusUtils.isBlank(ret))
+                if (!PrimusUtils.isBlank(ret)) {
                     textArea.appendText(ret + "\n");
+                    //textArea.setStyle("-fx-control-inner-background:#000000; -fx-font-family: Consolas; -fx-highlight-fill: #00ff00; -fx-highlight-text-fill: #000000; -fx-text-fill: #00ff00;");
+                }
             }
         }
     }
@@ -67,5 +69,10 @@ public class Controller {
         stage.setTitle("Primus - Script Editor");
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/Logo2.png")));
         stage.show();
+    }
+
+    @FXML
+    private void setDegreeMode(){
+        Settings.getSettings().setDegrees(menuDegrees.isSelected());
     }
 }

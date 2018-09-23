@@ -1,9 +1,12 @@
 package logic;
 
 import console.Database;
+import console.Settings;
 import objects.Function;
 import objects.PrimusObject;
 import objects.Variable;
+import org.nevec.rjm.BigDecimalMath;
+import org.nevec.rjm.Factorial;
 import utils.PrimusUtils;
 
 import java.math.BigDecimal;
@@ -40,12 +43,6 @@ public class Parser {
                 return x;
             }
 
-            // Grammar:
-            // expression = term | expression `+` term | expression `-` term
-            // term = factor | term `*` factor | term `/` factor
-            // factor = `+` factor | `-` factor | `(` expression `)`
-            //        | number | functionName factor | factor `^` factor
-
             BigDecimal parseExpression() {
                 BigDecimal x = parseTerm();
                 for (; ; ) {
@@ -65,6 +62,7 @@ public class Parser {
             }
 
             BigDecimal parseFactor() {
+                System.out.println("Degrees"+Settings.getSettings().useDegrees());
                 if (eat('+')) return parseFactor(); // unary plus
                 if (eat('-')) return parseFactor().negate(); // unary minus
 
@@ -111,10 +109,15 @@ public class Parser {
                         }
                     } else {
                         x = parseFactor();
+                        System.out.println("Factor:"+x.toPlainString());
                         if (func.equals("sqrt")) x = BigDecimalMath.sqrt(x, mc);
-                        else if (func.equals("sin")) x = BigDecimalMath.sin(x);
-                        else if (func.equals("cos")) x = BigDecimalMath.cos(x);
-                        else if (func.equals("tan")) x = BigDecimalMath.tan(x);
+                        else if (func.equals("sin")) x = new BigDecimal(Math.sin(x.doubleValue()), mc);
+                        else if (func.equals("cos")) x = new BigDecimal(Math.cos(x.doubleValue()), mc);
+                        else if (func.equals("tan")) x = new BigDecimal(Math.tan(x.doubleValue()), mc);
+                        else if (func.equals("ln"))  x = new BigDecimal(Math.log(x.doubleValue()), mc);
+                        else if (func.equals("log")) x = new BigDecimal(Math.log10(x.doubleValue()), mc);
+                        else if (func.equals("abs")) x = x.abs();
+                        else if (func.equals("fact") || func.equals("factorial")) ;
                         else throw new RuntimeException("Unknown function: " + func);
                     }
                 } else {

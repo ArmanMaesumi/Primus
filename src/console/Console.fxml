@@ -29,7 +29,7 @@
                 </Menu>
                 <Menu mnemonicParsing="false" text="Options">
                   <items>
-                        <CheckMenuItem mnemonicParsing="false" selected="true" text="Degrees" />
+                        <CheckMenuItem mnemonicParsing="false" selected="true" text="Degrees" fx:id="menuDegrees" onAction="#setDegreeMode"/>
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">

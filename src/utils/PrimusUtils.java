@@ -5,6 +5,11 @@ import java.util.Arrays;
 
 public class PrimusUtils {
 
+    public static boolean isErrorMessage(String s){
+        return s.startsWith("Error");
+    }
+
+
     public static boolean isBlank(String s) {
         return (s.trim()).isEmpty();
     }
@@ -26,7 +31,7 @@ public class PrimusUtils {
     }
 
 
-    public static String[] getFunctionArgs(String s){
+    public static String[] getFunctionArgs(String s) {
         s = s.substring(s.indexOf("(") + 1, s.indexOf(")"));
         s = s.replaceAll("\\s+", "");
         System.out.println("Args:" + s);
@@ -35,7 +40,7 @@ public class PrimusUtils {
     }
 
 
-    public static String[] getFunctionArgs2(String s){
+    public static String[] getFunctionArgs2(String s) {
         System.out.println(s);
 
         ArrayList<String> argList = new ArrayList<>();
@@ -45,7 +50,7 @@ public class PrimusUtils {
         int parentheses = 0;
         char ch;
 
-        while (pos < s.length()){
+        while (pos < s.length()) {
             ch = s.charAt(pos);
             System.out.println(ch);
             if (ch == '(')
@@ -53,8 +58,7 @@ public class PrimusUtils {
             else if (ch == ')')
                 parentheses--;
 
-            if ((ch == ',' && parentheses < 1) || (ch == ')' && parentheses < 0)){
-                //System.out.println(s.substring(startPos, pos));
+            if ((ch == ',' && parentheses < 1) || (ch == ')' && parentheses < 0)) {
                 argList.add(s.substring(startPos, pos));
                 startPos = pos + 1;
             }
@@ -63,7 +67,7 @@ public class PrimusUtils {
 
         String[] argArr = new String[argList.size()];
         argArr = argList.toArray(argArr);
-        System.out.println("argArr:"+Arrays.toString(argArr));
+        System.out.println("argArr:" + Arrays.toString(argArr));
         for (int i = 0; i < argArr.length; i++) {
             System.out.println(argArr[i]);
         }
@@ -72,7 +76,7 @@ public class PrimusUtils {
 
 
     // input: func(a, b, c)
-    public static String getFunctionId(String s){
+    public static String getFunctionId(String s) {
         s = s.trim();
         return s.substring(0, s.indexOf("("));
     }

@@ -50,11 +50,12 @@ public class ExecuteCommand {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            ret = e.toString();
+            ret = "Error in line: " + input + "\n" +
+                    "[ERROR]: " + e.getMessage();
         }
         System.out.println("Return value: " + ret);
         System.out.println("Command arr: " + Arrays.toString(command));
-        if (suppress)
+        if (suppress && !PrimusUtils.isErrorMessage(ret))
             ret = "";
         return ret;
     }

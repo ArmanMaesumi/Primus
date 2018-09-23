@@ -1,4 +1,4 @@
-package logic;
+package org.nevec.rjm;
 
 import java.security.* ;
 import java.util.* ;
