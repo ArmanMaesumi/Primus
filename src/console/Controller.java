@@ -6,13 +6,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logic.ExecuteCommand;
+import scripteditor.ScriptProcessor;
 import utils.PrimusUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class Controller {
     @FXML
@@ -49,8 +48,8 @@ public class Controller {
     }
 
 
-    private void send(String input){
-        String ret =  ExecuteCommand.send(input, false);
+    public void send(String input){
+        String ret = ExecuteCommand.send(input, false);
         textArea.appendText(">" + input + "\n");
         textField.setText("");
         if (!PrimusUtils.isBlank(ret))
@@ -59,16 +58,18 @@ public class Controller {
 
 
     @FXML
-    private void scriptEditorClicked() throws IOException {
-        Stage stage = (Stage) textArea.getScene().getWindow();
-        stage.close();
-        System.out.println("aaaaaaaa");
-        Parent root = FXMLLoader.load(Controller.class.getResource("../scripteditor/ScriptEditor.fxml"));
-        stage = new Stage();
-        stage.setScene(new Scene(root, 645, 700));
-        stage.setTitle("Primus - Script Editor");
-        stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/Logo2.png")));
-        stage.show();
+    private void scriptEditorClicked() {
+        ScreenController sc = ScreenController.getScreenController();
+        sc.activate("ScriptEditor");
+//        Stage stage = (Stage) textArea.getScene().getWindow();
+//        stage.close();
+//        Parent root = FXMLLoader.load(ScriptProcessor.class.getResource("ScriptEditor.fxml"));
+//        //Parent root = FXMLLoader.load(Controller.class.getResource("../scripteditor/ScriptEditor.fxml"));
+//        stage = new Stage();
+//        stage.setScene(new Scene(root, 645, 700));
+//        stage.setTitle("Primus - Script Editor");
+//        stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/Logo2.png")));
+//        stage.show();
     }
 
     @FXML

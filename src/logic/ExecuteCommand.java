@@ -54,13 +54,14 @@ public class ExecuteCommand {
                     "[ERROR]: " + e.getMessage();
         }
         System.out.println("Return value: " + ret);
-        System.out.println("Command arr: " + Arrays.toString(command));
         if (suppress && !PrimusUtils.isErrorMessage(ret))
             ret = "";
         return ret;
     }
 
     private static void defineVariable(String id, String val) {
+        if (val.trim().equals(""))
+            throw new IllegalArgumentException("Invalid expression in variable " + id);
         // Compute new value before deleting old value.
         // Reason: defVar x = x + 1
         BigDecimal newVal = Parser.eval(val);
@@ -69,9 +70,10 @@ public class ExecuteCommand {
     }
 
     private static void defineFunction(String id, String[] args, String exp) {
+        if (args.length == 1 && args[0].equals(""))
+            throw new IllegalArgumentException("Too few arguments in function " + id);
+
         Database.getDatabase().removePrimusObjectById(id);
         Database.getDatabase().getDefs().add(new Function(id, args, exp));
     }
-
-
 }

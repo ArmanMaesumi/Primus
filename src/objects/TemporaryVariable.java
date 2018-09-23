@@ -16,6 +16,11 @@ public class TemporaryVariable extends Variable {
         this.expired = false;
     }
 
+    public TemporaryVariable(TemporaryVariable clone){
+        super(clone);
+        this.expired = clone.isExpired();
+    }
+
     public boolean isExpired() {
         return expired;
     }

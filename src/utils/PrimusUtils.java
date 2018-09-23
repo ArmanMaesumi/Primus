@@ -34,15 +34,11 @@ public class PrimusUtils {
     public static String[] getFunctionArgs(String s) {
         s = s.substring(s.indexOf("(") + 1, s.indexOf(")"));
         s = s.replaceAll("\\s+", "");
-        System.out.println("Args:" + s);
-        System.out.println(Arrays.toString(s.split(",")));
         return s.split(",");
     }
 
 
     public static String[] getFunctionArgs2(String s) {
-        System.out.println(s);
-
         ArrayList<String> argList = new ArrayList<>();
 
         int pos = s.indexOf("(") + 1;

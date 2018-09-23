@@ -13,6 +13,11 @@ public class PrimusObject implements Serializable {
         this.value = value;
     }
 
+    public PrimusObject(PrimusObject clone) {
+        this.id = clone.id;
+        this.value = clone.value;
+    }
+
     public String getId() {
         return id;
     }
@@ -21,11 +26,11 @@ public class PrimusObject implements Serializable {
         this.id = id;
     }
 
-    public String getValue(){
+    public String getValue() {
         return value;
     }
 
-    public void setValue(String value){
+    public void setValue(String value) {
         this.value = value;
     }
 

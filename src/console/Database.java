@@ -40,6 +40,13 @@ public class Database {
     }
 
 
+    public void resetDatabase(){
+        defs.clear();
+        init = false;
+        populateDefaultDefinitions();
+    }
+
+
     public void populateDefaultDefinitions(){
         if (init)
             return;

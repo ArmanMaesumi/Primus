@@ -15,6 +15,16 @@ public class Function extends PrimusObject {
         this.args = args;
     }
 
+    public Function(Function clone){
+        super(clone);
+
+        String[] args = new String[clone.args.length];
+        for (int i = 0; i < args.length; i++) {
+            args[i] = clone.args[i];
+        }
+        this.args = args;
+    }
+
     public String[] getArgs() {
         return args;
     }
@@ -34,9 +44,7 @@ public class Function extends PrimusObject {
             //db.defineTemporaryVariable(args[i], inputArgs[i]);
         }
         db.addAllPrimusObjects(temporaryVariables);
-
         BigDecimal res = Parser.eval(getValue());
-
         db.removeAllPrimusObjects(temporaryVariables);
 
         return res;
