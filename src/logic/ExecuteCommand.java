@@ -19,7 +19,7 @@ public class ExecuteCommand {
         String[] command = input.split("\\s+");
         try {
             switch (command[0]) {
-                case "solve":
+                case "solve(":
                 case "eval":
                     String exp = input.substring(input.indexOf(' '), input.length());
                     ret = Parser.eval(exp).toString();

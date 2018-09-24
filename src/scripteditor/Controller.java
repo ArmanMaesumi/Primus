@@ -4,11 +4,13 @@ import console.Database;
 import console.ScreenController;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -36,11 +38,19 @@ public class Controller {
         outputTextArea.clear();
         progressBar.setProgress(0);
         Database.getDatabase().resetDatabase();
-        new Thread(() -> {
-            ScriptProcessor sc = new ScriptProcessor(textArea, outputTextArea, progressBar);
+        ScriptProcessor sc = new ScriptProcessor(textArea, outputTextArea, progressBar);
+        Runnable task = () -> {
             sc.runScript();
             run.setDisable(false);
-        }).start();
+        };
+        Thread backgroundThread = new Thread(task);
+        backgroundThread.setDaemon(true);
+        backgroundThread.start();
+//        new Thread(() -> {
+//            ScriptProcessor sc = new ScriptProcessor(textArea, outputTextArea, progressBar);
+//            sc.runScript();
+//            run.setDisable(false);
+//        }).start();
     }
 
     @FXML
@@ -58,16 +68,27 @@ public class Controller {
 
     @FXML
     public void openFileButton() {
-        JFileChooser chooser = new JFileChooser();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Text Doc (.txt)", "txt");
-        chooser.setFileFilter(filter);
-        chooser.setCurrentDirectory(new File("C:"));
-        int returnVal = chooser.showOpenDialog(null);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            path = chooser.getSelectedFile().getAbsolutePath();
-            openScript.readFile();
+        String readIn = OpenScript.loadScript(((Stage) textArea.getScene().getWindow()));
+        if (readIn != null) {
+            code = readIn;
             textArea.setText(code);
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Error when loading Primus file");
+            alert.setHeaderText("Primus IO error");
+            alert.setContentText("Primus could not load file.");
+            alert.showAndWait();
         }
+//        JFileChooser chooser = new JFileChooser();
+//        FileNameExtensionFilter filter = new FileNameExtensionFilter("Text Doc (.txt)", "txt");
+//        chooser.setFileFilter(filter);
+//        chooser.setCurrentDirectory(new File("C:"));
+//        int returnVal = chooser.showOpenDialog(null);
+//        if (returnVal == JFileChooser.APPROVE_OPTION) {
+//            path = chooser.getSelectedFile().getAbsolutePath();
+//            openScript.readFile();
+//            textArea.setText(code);
+//        }
     }
 
     @FXML
@@ -95,7 +116,8 @@ public class Controller {
 
     @FXML
     public void saveFileButton() {
-
+        code = textArea.getText();
+        SaveScript.saveScript(((Stage) textArea.getScene().getWindow()), code);
     }
 
     @FXML

@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Arrays;
+import java.util.Random;
 
 public class Parser {
 
@@ -21,6 +22,7 @@ public class Parser {
     public static BigDecimal eval(final String str) {
         return new Object() {
             int pos = -1, ch;
+            Random rand = new Random();
             Prime prime = new Prime();
             Database db = Database.getDatabase();
             MathContext mc = new MathContext(15, RoundingMode.HALF_UP);
@@ -165,6 +167,7 @@ public class Parser {
                         else if (func.equals("fact") || func.equals("factorial")) ;
                         else if (func.equals("isPrime"))
                             x = prime.contains(x.toBigInteger()) ? new BigDecimal("1") : new BigDecimal("0");
+                        else if (func.equals("random")) x = new BigDecimal(rand.nextInt(x.intValueExact()));
                         else throw new RuntimeException("Unknown function: " + func);
                     }
                 } else {

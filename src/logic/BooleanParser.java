@@ -64,7 +64,7 @@ public class BooleanParser {
             }
 
             boolean parseFactor() {
-                if (eat('-')) return !parseFactor(); // unary minus
+                if (eat('!')) return !parseFactor(); // unary minus
 
                 boolean b = false;
                 int startPos = this.pos;
