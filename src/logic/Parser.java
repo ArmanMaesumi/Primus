@@ -101,6 +101,7 @@ public class Parser {
                 for (; ; ) {
                     if (eat('*')) x = x.multiply(parseFactor(), mc); // multiplication
                     else if (eat('/')) x = x.divide(parseFactor(), mc); // division
+                    else if (eat('%')) x = x.remainder(parseFactor(), mc); //modulus
                     else return x;
                 }
             }
