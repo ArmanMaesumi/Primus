@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
 <?import javafx.scene.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
@@ -9,62 +10,74 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 
-<VBox prefHeight="700.0" prefWidth="645.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="scripteditor.Controller">
+<VBox fx:id="mainVBox" prefHeight="700.0" prefWidth="645.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="scripteditor.Controller">
     <children>
-        <MenuBar VBox.vgrow="NEVER">
-            <menus>
-                <Menu mnemonicParsing="false" text="File">
-                    <items>
-                        <MenuItem id="newFile" fx:id="newFile" mnemonicParsing="false" onAction="#newFileButton" text="New" />
-                        <MenuItem fx:id="openFile" mnemonicParsing="false" onAction="#openFileButton" text="Open…" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="closeFile" mnemonicParsing="false" onAction="#closeFileButton" text="Close" />
-                        <MenuItem fx:id="saveFile" mnemonicParsing="false" onAction="#saveFileButton" text="Save" />
-                        <MenuItem fx:id="saveAs" mnemonicParsing="false" onAction="#saveAsButton" text="Save As…" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="preferences" mnemonicParsing="false" onAction="#preferencesButton" text="Preferences…" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="quit" mnemonicParsing="false" onAction="#quitButton" text="Quit" />
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Edit">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="Undo" />
-                        <MenuItem mnemonicParsing="false" text="Redo" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" text="Cut" />
-                        <MenuItem mnemonicParsing="false" text="Copy" />
-                        <MenuItem mnemonicParsing="false" text="Paste" />
-                        <MenuItem mnemonicParsing="false" text="Delete" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem mnemonicParsing="false" text="Select All" />
-                        <MenuItem mnemonicParsing="false" text="Unselect All" />
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Run">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#runButton" text="Run" fx:id="run"/>
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Window">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#consoleButton" text="Console" />
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Help">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="About MyHelloApp" />
-                    </items>
-                </Menu>
-            </menus>
-            <cursor>
-                <Cursor fx:constant="DEFAULT" />
-            </cursor>
-        </MenuBar>
-      <SplitPane dividerPositions="0.5, 0.5" orientation="VERTICAL" prefHeight="657.0" prefWidth="645.0">
+      <HBox prefHeight="23.0" prefWidth="645.0">
+         <children>
+              <MenuBar>
+                  <menus>
+                      <Menu mnemonicParsing="false" text="File">
+                          <items>
+                              <MenuItem id="newFile" fx:id="newFile" mnemonicParsing="false" onAction="#newFileButton" text="New" />
+                              <MenuItem fx:id="openFile" mnemonicParsing="false" onAction="#openFileButton" text="Open…" />
+                              <SeparatorMenuItem mnemonicParsing="false" />
+                              <MenuItem fx:id="closeFile" mnemonicParsing="false" onAction="#closeFileButton" text="Close" />
+                              <MenuItem fx:id="saveFile" mnemonicParsing="false" onAction="#saveFileButton" text="Save" />
+                              <MenuItem fx:id="saveAs" mnemonicParsing="false" onAction="#saveAsButton" text="Save As…" />
+                              <SeparatorMenuItem mnemonicParsing="false" />
+                              <MenuItem fx:id="preferences" mnemonicParsing="false" onAction="#preferencesButton" text="Preferences…" />
+                              <SeparatorMenuItem mnemonicParsing="false" />
+                              <MenuItem fx:id="quit" mnemonicParsing="false" onAction="#quitButton" text="Quit" />
+                          </items>
+                      </Menu>
+                      <Menu mnemonicParsing="false" text="Edit">
+                          <items>
+                              <MenuItem mnemonicParsing="false" text="Undo" />
+                              <MenuItem mnemonicParsing="false" text="Redo" />
+                              <SeparatorMenuItem mnemonicParsing="false" />
+                              <MenuItem mnemonicParsing="false" text="Cut" />
+                              <MenuItem mnemonicParsing="false" text="Copy" />
+                              <MenuItem mnemonicParsing="false" text="Paste" />
+                              <MenuItem mnemonicParsing="false" text="Delete" />
+                              <SeparatorMenuItem mnemonicParsing="false" />
+                              <MenuItem mnemonicParsing="false" text="Select All" />
+                              <MenuItem mnemonicParsing="false" text="Unselect All" />
+                          </items>
+                      </Menu>
+                      <Menu mnemonicParsing="false" text="Run">
+                          <items>
+                              <MenuItem fx:id="run" mnemonicParsing="false" onAction="#runButton" text="Run" />
+                          </items>
+                      </Menu>
+                      <Menu mnemonicParsing="false" text="Window">
+                          <items>
+                              <MenuItem mnemonicParsing="false" onAction="#consoleButton" text="Console" />
+                          </items>
+                      </Menu>
+                      <Menu mnemonicParsing="false" text="Help">
+                          <items>
+                              <MenuItem mnemonicParsing="false" text="About MyHelloApp" />
+                          </items>
+                      </Menu>
+                  </menus>
+                  <cursor>
+                      <Cursor fx:constant="DEFAULT" />
+                  </cursor>
+              </MenuBar>
+            <Button mnemonicParsing="false" text="Run" onAction="#runButton">
+               <graphic>
+                  <ImageView fitHeight="18.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@/images/Run.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+         </children>
+      </HBox>
+      <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="657.0" prefWidth="645.0">
         <items>
               <TextArea fx:id="textArea" prefHeight="195.0" prefWidth="643.0" />
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="643.0" />
             <TextArea fx:id="outputTextArea" editable="false" prefHeight="200.0" prefWidth="200.0" />
         </items>
       </SplitPane>

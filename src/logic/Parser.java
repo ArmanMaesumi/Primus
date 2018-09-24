@@ -7,6 +7,7 @@ import objects.PrimusObject;
 import objects.Variable;
 import org.nevec.rjm.BigDecimalMath;
 import org.nevec.rjm.Factorial;
+import org.nevec.rjm.Prime;
 import utils.PrimusUtils;
 
 import java.math.BigDecimal;
@@ -20,8 +21,10 @@ public class Parser {
     public static BigDecimal eval(final String str) {
         return new Object() {
             int pos = -1, ch;
+            Prime prime = new Prime();
             Database db = Database.getDatabase();
             MathContext mc = new MathContext(15, RoundingMode.HALF_UP);
+
             void nextChar() {
                 ch = (++pos < str.length()) ? str.charAt(pos) : -1;
             }
@@ -38,9 +41,19 @@ public class Parser {
             BigDecimal parse() {
                 System.out.println("Original input: " + str);
                 nextChar();
-                BigDecimal x = parseExpression();
+                BigDecimal x = parseLogic();
                 if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char) ch);
                 return x;
+            }
+
+            BigDecimal parseLogic() {
+                BigDecimal x = parseExpression();
+                for (; ; ) {
+                    if (eat('<')){
+                        int res = x.compareTo(parseExpression());
+                        x = res == -1 ? new BigDecimal("1") : new BigDecimal("0");
+                    }
+                }
             }
 
             BigDecimal parseExpression() {
@@ -62,7 +75,6 @@ public class Parser {
             }
 
             BigDecimal parseFactor() {
-                System.out.println("Degrees"+Settings.getSettings().useDegrees());
                 if (eat('+')) return parseFactor(); // unary plus
                 if (eat('-')) return parseFactor().negate(); // unary minus
 
@@ -74,11 +86,10 @@ public class Parser {
                 } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
                     while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
                     x = new BigDecimal(str.substring(startPos, this.pos));
-                } else if (ch >= 'a' && ch <= 'z') { // functions
-                    while (ch >= 'a' && ch <= 'z') nextChar();
+                } else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) { // functions
+                    while ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) nextChar();
                     String func = str.substring(startPos, this.pos);
                     System.out.println("Func:" + func);
-                    System.out.println("db:" + db.getDefs().toString());
                     if (db.isPrimusObject(func)) {
                         System.out.println(func + " is a primus object");
                         PrimusObject obj = db.getPrimusObjectById(func);
@@ -88,7 +99,7 @@ public class Parser {
                         } else if (obj.getClass() == Function.class) {
                             startPos = this.pos;
                             int parentheses = 1;
-                            while(parentheses > 0){
+                            while (parentheses > 0) {
                                 nextChar();
                                 if (ch == '(')
                                     parentheses++;
@@ -96,28 +107,35 @@ public class Parser {
                                     parentheses--;
                             }
                             //while (ch != ')') nextChar();
-                            String arg = "("+str.substring(startPos + 1, this.pos)+")";
-                            String[] argArr = PrimusUtils.getFunctionArgs2(arg);
-                            System.out.println("args:" + Arrays.toString(argArr));
-                            String[] argValues = new String[argArr.length];
-                            for (int i = 0; i < argArr.length; i++) {
-                                argValues[i] = Parser.eval(argArr[i]).toString();
+                            if (func.equals("eval")) {
+                                obj.setValue(str.substring(startPos + 1, this.pos));
+                                x = ((Function) obj).eval(new String[1]);
+                            } else {
+                                String arg = "(" + str.substring(startPos + 1, this.pos) + ")";
+                                String[] argArr = PrimusUtils.getFunctionArgs2(arg);
+                                System.out.println("args:" + Arrays.toString(argArr));
+                                String[] argValues = new String[argArr.length];
+                                for (int i = 0; i < argArr.length; i++) {
+                                    argValues[i] = Parser.eval(argArr[i]).toString();
+                                }
+                                System.out.println("ARG Values " + Arrays.toString(argValues));
+                                x = ((Function) obj).eval(argValues);
                             }
-                            System.out.println("ARG Values " + Arrays.toString(argValues));
-                            x = ((Function) obj).eval(argValues);
                             eat(')');
                         }
                     } else {
                         x = parseFactor();
-                        System.out.println("Factor:"+x.toPlainString());
+                        System.out.println("Factor:" + x.toPlainString());
                         if (func.equals("sqrt")) x = BigDecimalMath.sqrt(x, mc);
                         else if (func.equals("sin")) x = new BigDecimal(Math.sin(x.doubleValue()), mc);
                         else if (func.equals("cos")) x = new BigDecimal(Math.cos(x.doubleValue()), mc);
                         else if (func.equals("tan")) x = new BigDecimal(Math.tan(x.doubleValue()), mc);
-                        else if (func.equals("ln"))  x = new BigDecimal(Math.log(x.doubleValue()), mc);
+                        else if (func.equals("ln")) x = new BigDecimal(Math.log(x.doubleValue()), mc);
                         else if (func.equals("log")) x = new BigDecimal(Math.log10(x.doubleValue()), mc);
                         else if (func.equals("abs")) x = x.abs();
                         else if (func.equals("fact") || func.equals("factorial")) ;
+                        else if (func.equals("isPrime"))
+                            x = prime.contains(x.toBigInteger()) ? new BigDecimal("1") : new BigDecimal("0");
                         else throw new RuntimeException("Unknown function: " + func);
                     }
                 } else {

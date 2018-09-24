@@ -4,11 +4,12 @@
     <properties id="javafx-properties">
       <options>
         <option name="appClass" value="console.Main" />
-        <option name="description" value="test" />
-        <option name="htmlParamFile" value="" />
-        <option name="paramFile" value="" />
+        <option name="description" value="Primus" />
+        <option name="htmlPlaceholderId" value="" />
+        <option name="nativeBundle" value="all" />
         <option name="title" value="Primus" />
-        <option name="vendor" value="Arman" />
+        <option name="vendor" value="Arman Maesumi" />
+        <option name="version" value="0.1" />
       </options>
     </properties>
     <root id="root">

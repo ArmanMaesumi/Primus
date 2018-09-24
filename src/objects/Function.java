@@ -15,7 +15,7 @@ public class Function extends PrimusObject {
         this.args = args;
     }
 
-    public Function(Function clone){
+    public Function(Function clone) {
         super(clone);
 
         String[] args = new String[clone.args.length];
@@ -34,18 +34,26 @@ public class Function extends PrimusObject {
     }
 
     public BigDecimal eval(String[] inputArgs) {
-        Database db = Database.getDatabase();
         if (args.length != inputArgs.length)
             throw new IllegalArgumentException("Argument length mismatch in function: " + toString());
 
-        ArrayList<PrimusObject> temporaryVariables = new ArrayList<>();
-        for (int i = 0; i < args.length; i++) {
-            temporaryVariables.add(new TemporaryVariable(args[i], inputArgs[i]));
-            //db.defineTemporaryVariable(args[i], inputArgs[i]);
+        Database db = Database.getDatabase();
+        BigDecimal res;
+
+        if (getId().equals("eval")) {
+            System.out.println("getvalue"+getValue());
+            res = Parser.eval(getValue());
+            System.out.println("res"+res.toPlainString());
+        } else {
+            ArrayList<PrimusObject> temporaryVariables = new ArrayList<>();
+            for (int i = 0; i < args.length; i++) {
+                temporaryVariables.add(new TemporaryVariable(args[i], inputArgs[i]));
+                //db.defineTemporaryVariable(args[i], inputArgs[i]);
+            }
+            db.addAllPrimusObjects(temporaryVariables);
+            res = Parser.eval(getValue());
+            db.removeAllPrimusObjects(temporaryVariables);
         }
-        db.addAllPrimusObjects(temporaryVariables);
-        BigDecimal res = Parser.eval(getValue());
-        db.removeAllPrimusObjects(temporaryVariables);
 
         return res;
     }

@@ -28,8 +28,6 @@ public class Main extends Application {
         sc.init(scene, primaryStage);
         sc.addScreen("Console",
                 FXMLLoader.load(getClass().getResource("Console.fxml")), 600, 400);
-        sc.addScreen("ScriptEditor",
-                FXMLLoader.load(ScriptProcessor.class.getResource("ScriptEditor.fxml")), 645,700);
         sc.activate("Console");
     }
 

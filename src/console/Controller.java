@@ -60,6 +60,12 @@ public class Controller {
     @FXML
     private void scriptEditorClicked() {
         ScreenController sc = ScreenController.getScreenController();
+        try {
+            sc.addScreen("ScriptEditor",
+                    FXMLLoader.load(ScriptProcessor.class.getResource("ScriptEditor.fxml")), 645,700);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         sc.activate("ScriptEditor");
 //        Stage stage = (Stage) textArea.getScene().getWindow();
 //        stage.close();

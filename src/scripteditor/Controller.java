@@ -1,22 +1,18 @@
 package scripteditor;
 
 import console.Database;
-import console.Main;
 import console.ScreenController;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Created by Arman on 10/12/2015.
@@ -32,24 +28,36 @@ public class Controller {
     public TextArea textArea;
     public TextArea outputTextArea;
     public ProgressBar progressBar;
+    public VBox mainVBox;
 
     @FXML
-    public void runButton(){
+    public void runButton() {
         run.setDisable(true);
-        code = textArea.getText();
         outputTextArea.clear();
         progressBar.setProgress(0);
         Database.getDatabase().resetDatabase();
-        ScriptProcessor.runScript(textArea, outputTextArea, progressBar);
-        run.setDisable(false);
+        new Thread(() -> {
+            ScriptProcessor sc = new ScriptProcessor(textArea, outputTextArea, progressBar);
+            sc.runScript();
+            run.setDisable(false);
+        }).start();
     }
 
     @FXML
-    public void newFileButton(){
+    public void initialize() {
+        Platform.runLater(() -> {
+            textArea.setWrapText(true);
+            textArea.requestFocus();
+        });
+    }
+
+    @FXML
+    public void newFileButton() {
         textArea.setText("");
     }
+
     @FXML
-    public void openFileButton(){
+    public void openFileButton() {
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Text Doc (.txt)", "txt");
         chooser.setFileFilter(filter);
@@ -61,6 +69,7 @@ public class Controller {
             textArea.setText(code);
         }
     }
+
     @FXML
     public void consoleButton() {
         ScreenController sc = ScreenController.getScreenController();
@@ -80,23 +89,27 @@ public class Controller {
     }
 
     @FXML
-    public void closeFileButton(){
+    public void closeFileButton() {
 
     }
+
     @FXML
-    public void saveFileButton(){
+    public void saveFileButton() {
 
     }
+
     @FXML
-    public void saveAsButton(){
+    public void saveAsButton() {
 
     }
+
     @FXML
-    public void preferencesButton(){
+    public void preferencesButton() {
 
     }
+
     @FXML
-    public void quitButton(){
+    public void quitButton() {
 
     }
 

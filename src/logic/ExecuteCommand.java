@@ -1,23 +1,15 @@
 package logic;
 
 import console.Database;
-import objects.Function;
-import objects.PrimusObject;
-import objects.Variable;
 import utils.PrimusUtils;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
 
 public class ExecuteCommand {
 
     public static String send(String input, boolean suppress) {
+        if (PrimusUtils.isBlank(input))
+            return "";
+
         Database db = Database.getDatabase();
-//        defineVariable("x", "2");
-//        System.out.println(Database.getValueOfObjectById("x"));
-//        System.out.println(Database.getPrimusObjectById("x"));
-//        System.out.println(Database.isPrimusObject("x"));
-//        System.out.println("---");
         String ret = "";
         if (PrimusUtils.isSuppressed(input)) {
             suppress = true;
@@ -33,13 +25,17 @@ public class ExecuteCommand {
                     break;
                 case "defVar":
                 case "defVariable":
-                    defineVariable(command[1], PrimusUtils.afterFirstEquals(input));
+                    db.defineVariable(command[1], PrimusUtils.afterFirstEquals(input));
                     break;
                 case "defFunc":
                 case "defFunction":
                     String id = PrimusUtils.getFunctionId(command[1]);
                     String[] args = PrimusUtils.getFunctionArgs(input);
-                    defineFunction(id, args, PrimusUtils.afterFirstEquals(input));
+                    db.defineFunction(id, args, PrimusUtils.afterFirstEquals(input));
+                    break;
+                case "if":
+                    exp = input.substring(input.indexOf(' '), input.length());
+                    ret = String.valueOf(BooleanParser.eval(exp));
                     break;
                 case "defs":
                     ret = db.getDefs().toString();
@@ -57,23 +53,5 @@ public class ExecuteCommand {
         if (suppress && !PrimusUtils.isErrorMessage(ret))
             ret = "";
         return ret;
-    }
-
-    private static void defineVariable(String id, String val) {
-        if (val.trim().equals(""))
-            throw new IllegalArgumentException("Invalid expression in variable " + id);
-        // Compute new value before deleting old value.
-        // Reason: defVar x = x + 1
-        BigDecimal newVal = Parser.eval(val);
-        Database.getDatabase().removePrimusObjectById(id);
-        Database.getDatabase().getDefs().add(new Variable(id, newVal));
-    }
-
-    private static void defineFunction(String id, String[] args, String exp) {
-        if (args.length == 1 && args[0].equals(""))
-            throw new IllegalArgumentException("Too few arguments in function " + id);
-
-        Database.getDatabase().removePrimusObjectById(id);
-        Database.getDatabase().getDefs().add(new Function(id, args, exp));
     }
 }
