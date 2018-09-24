@@ -49,10 +49,39 @@ public class Parser {
             BigDecimal parseLogic() {
                 BigDecimal x = parseExpression();
                 for (; ; ) {
-                    if (eat('<')){
-                        int res = x.compareTo(parseExpression());
-                        x = res == -1 ? new BigDecimal("1") : new BigDecimal("0");
+                    int startPos = this.pos;
+                    if (ch == '>' || ch == '<' || ch == '=' || ch == '!') {
+                        while (ch == '>' || ch == '<' || ch == '=' || ch == '!') nextChar();
+                        String operator = str.substring(startPos, this.pos);
+                        if (operator.equals(">")) {
+                            int res = x.compareTo(parseExpression());
+                            x = res > 0 ? new BigDecimal("1") : new BigDecimal("0");
+                        } else if (operator.equals("<")) {
+                            int res = x.compareTo(parseExpression());
+                            x = res < 0 ? new BigDecimal("1") : new BigDecimal("0");
+                        } else if (operator.equals("==")) {
+                            int res = x.compareTo(parseExpression());
+                            x = res == 0 ? new BigDecimal("1") : new BigDecimal("0");
+                        } else if (operator.equals(">=")) {
+                            BigDecimal temp = parseExpression();
+                            if (x.compareTo(temp) > 0 || x.compareTo(temp) == 0)
+                                x = new BigDecimal("1");
+                            else
+                                x = new BigDecimal("0");
+                        } else if (operator.equals("<=")) {
+                            BigDecimal temp = parseExpression();
+                            if (x.compareTo(temp) < 0 || x.compareTo(temp) == 0)
+                                x = new BigDecimal("1");
+                            else
+                                x = new BigDecimal("0");
+                        } else if (operator.equals("!=")) {
+                            int res = x.compareTo(parseExpression());
+                            x = res != 0 ? new BigDecimal("1") : new BigDecimal("0");
+                        } else {
+                            return x;
+                        }
                     }
+                    return x;
                 }
             }
 
@@ -81,7 +110,7 @@ public class Parser {
                 BigDecimal x = new BigDecimal("0", mc);
                 int startPos = this.pos;
                 if (eat('(')) { // parentheses
-                    x = parseExpression();
+                    x = parseLogic();
                     eat(')');
                 } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
                     while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();

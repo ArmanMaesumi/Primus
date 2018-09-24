@@ -24,10 +24,13 @@ public class Database {
     private static final Map<String, BigDecimal> constants = new HashMap<String, BigDecimal>() {{
         put("pi", new BigDecimal("3.1415926535897932384626433832795028841971693993751058209749"));
         put("e", new BigDecimal("2.718281828459045235360287471352662497757247093699959574966"));
+        put("true", new BigDecimal("1"));
+        put("false", new BigDecimal("0"));
     }};
 
     private static final String[] RESERVED_KEYWORDS =
-            {"sqrt", "sin", "cos", "tan", "ln", "log", "abs", "fact", "factorial", "isPrime", "eval"};
+            {"sqrt", "sin", "cos", "tan", "ln", "log", "abs", "fact", "factorial", "isPrime", "eval",
+            "true", "false"};
 
     private Database() {
 
@@ -56,7 +59,7 @@ public class Database {
             return;
 
         for (Map.Entry<String, BigDecimal> entry : constants.entrySet()) {
-            defineVariable(entry.getKey(), entry.getValue().toPlainString());
+            defineReservedTerm(entry.getKey(), entry.getValue().toPlainString());
         }
         evalFunction = new Function("eval", new String[1], "");
         defs.add(evalFunction);
@@ -129,6 +132,15 @@ public class Database {
         return false;
     }
 
+    public void defineReservedTerm(String id, String val){
+        if (val.trim().equals(""))
+            throw new IllegalArgumentException("Invalid expression in variable " + id);
+        // Compute new value before deleting old value.
+        // Reason: defVar x = x + 1
+        BigDecimal newVal = Parser.eval(val);
+        removePrimusObjectById(id);
+        defs.add(new Variable(id, newVal));
+    }
 
     public void defineVariable(String id, String val) {
         if (isReserved(id))

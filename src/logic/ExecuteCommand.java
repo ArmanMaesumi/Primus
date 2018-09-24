@@ -10,6 +10,7 @@ public class ExecuteCommand {
             return "";
 
         Database db = Database.getDatabase();
+        input = input.trim();
         String ret = "";
         if (PrimusUtils.isSuppressed(input)) {
             suppress = true;

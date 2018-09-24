@@ -39,8 +39,8 @@ public class BooleanParser {
                 System.out.println("Original input: " + str);
                 nextChar();
                 boolean b = parseExpression();
-                System.out.println("EXP:"+b);
-                System.out.println("char:"+ch);
+                System.out.println("EXP:" + b);
+                System.out.println("char:" + ch);
                 if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char) ch);
                 return b;
             }
@@ -54,11 +54,11 @@ public class BooleanParser {
                 }
             }
 
-            boolean parseTerm(){
+            boolean parseTerm() {
                 boolean b = parseFactor();
                 for (; ; ) {
-                    if (eat('<'));
-                    else if (eat('>'));
+                    if (eat('<')) ;
+                    else if (eat('>')) ;
                     else return b;
                 }
             }
@@ -98,15 +98,21 @@ public class BooleanParser {
                                     parentheses--;
                             }
                             //while (ch != ')') nextChar();
-                            String arg = "(" + str.substring(startPos + 1, this.pos) + ")";
-                            String[] argArr = PrimusUtils.getFunctionArgs2(arg);
-                            System.out.println("args:" + Arrays.toString(argArr));
-                            String[] argValues = new String[argArr.length];
-                            for (int i = 0; i < argArr.length; i++) {
-                                argValues[i] = Parser.eval(argArr[i]).toString();
+                            if (func.equals("eval")) {
+                                obj.setValue(str.substring(startPos + 1, this.pos));
+                                BigDecimal res = ((Function) obj).eval(new String[1]);
+                                b = res.compareTo(new BigDecimal("1")) == 0;
+                            } else {
+                                String arg = "(" + str.substring(startPos + 1, this.pos) + ")";
+                                String[] argArr = PrimusUtils.getFunctionArgs2(arg);
+                                System.out.println("args:" + Arrays.toString(argArr));
+                                String[] argValues = new String[argArr.length];
+                                for (int i = 0; i < argArr.length; i++) {
+                                    argValues[i] = Parser.eval(argArr[i]).toString();
+                                }
+                                System.out.println("ARG Values " + Arrays.toString(argValues));
+                                //b = ((Function) obj).eval(argValues);
                             }
-                            System.out.println("ARG Values " + Arrays.toString(argValues));
-                            //x = ((Function) obj).eval(argValues);
                             eat(')');
                         }
                     } else {
