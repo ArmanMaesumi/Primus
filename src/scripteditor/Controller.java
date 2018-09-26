@@ -79,34 +79,12 @@ public class Controller {
             alert.setContentText("Primus could not load file.");
             alert.showAndWait();
         }
-//        JFileChooser chooser = new JFileChooser();
-//        FileNameExtensionFilter filter = new FileNameExtensionFilter("Text Doc (.txt)", "txt");
-//        chooser.setFileFilter(filter);
-//        chooser.setCurrentDirectory(new File("C:"));
-//        int returnVal = chooser.showOpenDialog(null);
-//        if (returnVal == JFileChooser.APPROVE_OPTION) {
-//            path = chooser.getSelectedFile().getAbsolutePath();
-//            openScript.readFile();
-//            textArea.setText(code);
-//        }
     }
 
     @FXML
     public void consoleButton() {
         ScreenController sc = ScreenController.getScreenController();
         sc.activate("Console");
-//        try {
-//            Stage stage = (Stage) textArea.getScene().getWindow();
-//            stage.close();
-//            Parent root = FXMLLoader.load(Main.class.getResource("Console.fxml"));
-//            stage = new Stage();
-//            stage.setScene(new Scene(root, 600, 400));
-//            stage.setTitle("Primus");
-//            stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/Logo2.png")));
-//            stage.show();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
     @FXML

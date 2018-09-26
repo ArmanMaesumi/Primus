@@ -3,6 +3,7 @@ package logic;
 import console.Database;
 import console.Settings;
 import objects.Function;
+import objects.Method;
 import objects.PrimusObject;
 import objects.Variable;
 import org.nevec.rjm.BigDecimalMath;
@@ -145,15 +146,17 @@ public class Parser {
                             } else {
                                 String arg = "(" + str.substring(startPos + 1, this.pos) + ")";
                                 String[] argArr = PrimusUtils.getFunctionArgs2(arg);
-                                System.out.println("args:" + Arrays.toString(argArr));
                                 String[] argValues = new String[argArr.length];
+
                                 for (int i = 0; i < argArr.length; i++) {
                                     argValues[i] = Parser.eval(argArr[i]).toString();
                                 }
-                                System.out.println("ARG Values " + Arrays.toString(argValues));
+
                                 x = ((Function) obj).eval(argValues);
                             }
                             eat(')');
+                        } else if (obj.getClass() == Method.class){
+
                         }
                     } else {
                         x = parseFactor();

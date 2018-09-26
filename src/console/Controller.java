@@ -28,9 +28,6 @@ public class Controller {
     public void enterButtonClicked() {
         boolean testing = false;
         if (testing) {
-            //System.out.println(Arrays.toString(PrimusUtils.getFunctionArgs2("f(1,2,3,4)")));
-            //System.out.println(Arrays.toString(PrimusUtils.getFunctionArgs2("f(f(1,2,3),4,5)")));
-            //System.out.println(Arrays.toString(PrimusUtils.getFunctionArgs2("f(f(f(2),2,3),g(1,2),5)")));
             send("defFunction f(a,b,c) = a");
             send("eval f(f(1,0,0),0,0)");
         } else {
@@ -67,15 +64,6 @@ public class Controller {
             e.printStackTrace();
         }
         sc.activate("ScriptEditor");
-//        Stage stage = (Stage) textArea.getScene().getWindow();
-//        stage.close();
-//        Parent root = FXMLLoader.load(ScriptProcessor.class.getResource("ScriptEditor.fxml"));
-//        //Parent root = FXMLLoader.load(Controller.class.getResource("../scripteditor/ScriptEditor.fxml"));
-//        stage = new Stage();
-//        stage.setScene(new Scene(root, 645, 700));
-//        stage.setTitle("Primus - Script Editor");
-//        stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/Logo2.png")));
-//        stage.show();
     }
 
     @FXML

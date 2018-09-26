@@ -3,23 +3,39 @@ package logic;
 import console.Database;
 import utils.PrimusUtils;
 
+/**
+ * Class that handles input Primus input commands.
+ */
 public class ExecuteCommand {
 
+    /**
+     * Send command to Primus.
+     *
+     * @param input    - User input.
+     * @param suppress - Whether or not to suppress the output of command.
+     * @return The value of the processed input.
+     */
     public static String send(String input, boolean suppress) {
+        // If input is effectively blank, return nothing
         if (PrimusUtils.isBlank(input))
             return "";
 
         Database db = Database.getDatabase();
         input = input.trim();
         String ret = "";
+
         if (PrimusUtils.isSuppressed(input)) {
             suppress = true;
             input = input.substring(1, input.length());
         }
+
+        // Split input by spaces
         String[] command = input.split("\\s+");
+
+        // Process input:
         try {
             switch (command[0]) {
-                case "solve(":
+                case "solve":
                 case "eval":
                     String exp = input.substring(input.indexOf(' '), input.length());
                     ret = Parser.eval(exp).toString();

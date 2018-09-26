@@ -8,7 +8,7 @@ public class PrimusObject implements Serializable {
     private String value;
 
     public PrimusObject(String id, String value) {
-        value = value.trim();
+        //value = value.trim();
         this.id = id;
         this.value = value;
     }

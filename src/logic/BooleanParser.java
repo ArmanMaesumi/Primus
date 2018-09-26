@@ -4,14 +4,10 @@ import console.Database;
 import objects.Bool;
 import objects.Function;
 import objects.PrimusObject;
-import objects.Variable;
-import org.nevec.rjm.BigDecimalMath;
 import org.nevec.rjm.Prime;
 import utils.PrimusUtils;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.Arrays;
 
 public class BooleanParser {
