@@ -1,7 +1,11 @@
 package logic;
 
 import console.Database;
+import objects.Method;
+import objects.PrimusObject;
 import utils.PrimusUtils;
+
+import java.util.Arrays;
 
 /**
  * Class that handles input Primus input commands.
@@ -32,7 +36,7 @@ public class ExecuteCommand {
         // Split input by spaces
         String[] command = input.split("\\s+");
 
-        // Process input:
+        // Process command:
         try {
             switch (command[0]) {
                 case "solve":
@@ -58,7 +62,8 @@ public class ExecuteCommand {
                     ret = db.getDefs().toString();
                     break;
                 default:
-                    ret = "Command not recognized: " + input;
+                    ret = additionalCommands(input);
+                    //ret = "Command not recognized: " + input;
                     break;
             }
         } catch (Exception e) {
@@ -70,5 +75,50 @@ public class ExecuteCommand {
         if (suppress && !PrimusUtils.isErrorMessage(ret))
             ret = "";
         return ret;
+    }
+
+    private static String additionalCommands(String input) {
+        Database db = Database.getDatabase();
+        String ret = "";
+
+        try {
+            // Set operation
+            if (input.contains(":=")) {
+                String id = PrimusUtils.getSetId(input);
+                PrimusObject target = db.getPrimusObjectById(id);
+                if (target != null) {
+                    target.setValue(PrimusUtils.getSetExpression(input));
+                    ret = target.toString();
+                }
+            } else {
+                if (!runVoidMethod(input))
+                    ret = "Command not recognized: " + input;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            ret = "Error in line: " + input + "\n" +
+                    "[ERROR]: " + e.getMessage();
+        }
+
+        return ret;
+    }
+
+    private static boolean runVoidMethod(String input) {
+        boolean ran = false;
+        System.out.println("input:"+input);
+        Database db = Database.getDatabase();
+        String methodId = PrimusUtils.getFunctionId(input);
+        PrimusObject method = db.getPrimusObjectById(methodId);
+
+        if (method != null) {
+            if (method instanceof Method) {
+                String args[] = PrimusUtils.getFunctionArgs2(input);
+                System.out.println("Method args:" + Arrays.toString(args));
+                ((Method) method).runMethod(args);
+                ran = true;
+            }
+        }
+
+        return ran;
     }
 }

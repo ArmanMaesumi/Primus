@@ -38,7 +38,11 @@ public class Controller {
         outputTextArea.clear();
         progressBar.setProgress(0);
         Database.getDatabase().resetDatabase();
-        ScriptProcessor sc = new ScriptProcessor(textArea, outputTextArea, progressBar);
+        //ScriptProcessor sc = new ScriptProcessor(textArea, outputTextArea, progressBar);
+        ScriptProcessor.in = this.textArea;
+        ScriptProcessor.out = this.outputTextArea;
+        ScriptProcessor.progressBar = this.progressBar;
+        ScriptProcessor sc = new ScriptProcessor(this.textArea.getText());
         Runnable task = () -> {
             sc.runScript();
             run.setDisable(false);
@@ -46,11 +50,6 @@ public class Controller {
         Thread backgroundThread = new Thread(task);
         backgroundThread.setDaemon(true);
         backgroundThread.start();
-//        new Thread(() -> {
-//            ScriptProcessor sc = new ScriptProcessor(textArea, outputTextArea, progressBar);
-//            sc.runScript();
-//            run.setDisable(false);
-//        }).start();
     }
 
     @FXML

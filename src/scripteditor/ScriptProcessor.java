@@ -1,5 +1,6 @@
 package scripteditor;
 
+import console.Database;
 import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
@@ -15,9 +16,9 @@ import java.util.Collections;
 
 public class ScriptProcessor {
 
-    private TextArea in;
-    private TextArea out;
-    private ProgressBar progressBar;
+    public static TextArea in;
+    public static TextArea out;
+    public static ProgressBar progressBar;
 
     private String code;
     private String[] lines;
@@ -25,17 +26,7 @@ public class ScriptProcessor {
 
     private Method[] methods;
 
-    public ScriptProcessor(TextArea in, TextArea out, ProgressBar progressBar) {
-        this.in = in;
-        this.out = out;
-        this.progressBar = progressBar;
-        this.code = in.getText();
-        init();
-    }
-
-    public ScriptProcessor(TextArea out, ProgressBar progressBar, String code) {
-        this.out = out;
-        this.progressBar = progressBar;
+    public ScriptProcessor(String code){
         this.code = code;
         init();
     }
@@ -71,9 +62,10 @@ public class ScriptProcessor {
             String methodLine = lines[currentLineNum];
             String[] methodLineSplit = methodLine.split("\\s+");
 
-            String methodId = PrimusUtils.getFunctionId(methodLineSplit[1]);
-            String[] args = PrimusUtils.getFunctionArgs(methodLine);
-
+            String methodId = PrimusUtils.getFunctionId(methodLineSplit[2]);
+            Class methodType = PrimusUtils.getClassFromType(methodLineSplit[1]);
+            String[] args = PrimusUtils.getFunctionArgs2(methodLine);
+            System.out.println("input to method:" + Arrays.toString(args));
             StringBuilder methodCode = new StringBuilder();
             int targetTab = tabs[currentLineNum];
             for (int j = currentLineNum + 1; j < lines.length; j++) {
@@ -85,11 +77,15 @@ public class ScriptProcessor {
                     break;
                 }
             }
+
             methods[i] = new Method(
                     methodId,
-                    new PrimusObject[]{new Variable("x", "1")},
+                    methodType,
+                    args,
                     methodCode.toString());
 
+            Database.getDatabase().defineMethod(methodId, methodType, args, methodCode.toString());
+            Database.getDatabase().getDefs().add(methods[i]);
             System.out.println(methods[i].toString());
         }
     }
@@ -103,7 +99,7 @@ public class ScriptProcessor {
             line = line.trim();
 
             if (maxTab >= tabs[lineNum]) {
-                if (line.startsWith("method")){
+                if (line.startsWith("method")) {
 
                 } else if (line.startsWith("if")) {
                     ret = ExecuteCommand.send(line, false);
@@ -137,7 +133,7 @@ public class ScriptProcessor {
                     }
                     System.out.println("for code:");
                     System.out.println(forCode.toString());
-                    ScriptProcessor forScript = new ScriptProcessor(out, progressBar, forCode.toString());
+                    ScriptProcessor forScript = new ScriptProcessor(forCode.toString());
                     while (ExecuteCommand.send("if " + forLoop[1], false).equals("true")) {
                         forScript.runScript();
                         ExecuteCommand.send("defVar " + varId + " = " + forLoop[2], true);
@@ -167,7 +163,7 @@ public class ScriptProcessor {
      */
     private static String removeIndents(String s, int remove) {
         int tabs = s.length() - s.replace("\t", "").length();
-        while (tabs > 0 && remove > 0){
+        while (tabs > 0 && remove > 0) {
             s = s.replaceFirst("\t", "");
             tabs--;
             remove--;

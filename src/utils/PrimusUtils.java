@@ -1,42 +1,63 @@
 package utils;
 
+import objects.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class PrimusUtils {
 
-    public static boolean isErrorMessage(String s){
-        return s.startsWith("Error");
+    public static final String SET_SYNTAX = ":=";
+
+    public static Class getClassFromType(String type) {
+        if (type.equals("var"))
+            return Variable.class;
+        else if (type.equals("function"))
+            return Function.class;
+        else if (type.equals("void"))
+            return PrimusObject.class;
+
+        throw new IllegalArgumentException("Invalid method type: " + type);
     }
 
+    public static boolean isPrimusObjectClass(Class c) {
+        return PrimusObject.class.isAssignableFrom(c.getClass());
+    }
+
+    public static String getSetExpression(String s) {
+        return s.trim().substring(s.indexOf(SET_SYNTAX) + SET_SYNTAX.length(), s.length());
+    }
+
+    public static String getSetId(String s) {
+        return s.trim().substring(0, s.indexOf(SET_SYNTAX)).trim();
+    }
+
+    public static boolean isErrorMessage(String s) {
+        return s.startsWith("Error");
+    }
 
     public static boolean isBlank(String s) {
         return (s.trim()).isEmpty();
     }
 
-
     public static String afterFirstEquals(String s) {
         return s.substring(s.indexOf("=") + 1, s.length());
     }
 
-
     public static boolean isSuppressed(String s) {
         return s.startsWith("@");
     }
-
 
     public static int numberOfArgs(String s) {
         s = s.substring(s.indexOf("(") + 1, s.indexOf(")"));
         return (s.split(",").length);
     }
 
-
     public static String[] getFunctionArgs(String s) {
         s = s.substring(s.indexOf("(") + 1, s.indexOf(")"));
         s = s.replaceAll("\\s+", "");
         return s.split(",");
     }
-
 
     public static String[] getFunctionArgs2(String s) {
         ArrayList<String> argList = new ArrayList<>();

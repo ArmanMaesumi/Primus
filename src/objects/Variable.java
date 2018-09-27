@@ -1,7 +1,12 @@
 package objects;
 
+import logic.Parser;
+
 import java.math.BigDecimal;
 
+/**
+ * Primus Variable class. Stores a changeable arbitrary-precision value.
+ */
 public class Variable extends PrimusObject {
 
     private BigDecimal numericValue;
@@ -25,9 +30,9 @@ public class Variable extends PrimusObject {
         return numericValue.toPlainString();
     }
 
-    public void setNumericValue(String value) {
-        this.numericValue = new BigDecimal(value);
-        this.setValue(value);
+    public void setValue(String value){
+        this.numericValue = Parser.eval(value);
+        super.setValue(numericValue.toPlainString());
     }
 
     public String toString() {

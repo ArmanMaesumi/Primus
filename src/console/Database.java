@@ -1,10 +1,7 @@
 package console;
 
 import logic.Parser;
-import objects.Function;
-import objects.PrimusObject;
-import objects.TemporaryVariable;
-import objects.Variable;
+import objects.*;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -233,6 +230,23 @@ public class Database {
         // Remove and replace if Function already exists.
         removePrimusObjectById(id);
         defs.add(new Function(id, args, exp));
+    }
+
+    /**
+     * Creates a Primus Method.
+     *
+     * @param id   - Method id.
+     * @param type - Method type (void, var, function).
+     * @param args - Method arguments
+     * @param code - Code contained by method.
+     */
+    public void defineMethod(String id, Class type, String[] args, String code) {
+        removePrimusObjectById(id);
+        defs.add(new Method(
+                id,
+                type,
+                args,
+                code));
     }
 
     /**

@@ -1,5 +1,10 @@
 package objects;
 
+import console.Database;
+import logic.ExecuteCommand;
+import scripteditor.ScriptProcessor;
+import utils.PrimusUtils;
+
 /**
  * PrimusObject Method class.
  * Used in the form test(defVar x, defFunction f)
@@ -7,18 +12,25 @@ package objects;
 public class Method extends PrimusObject {
 
     // Method Arguments
-    private PrimusObject[] args;
+    private String[] args;
+
+    // Return type
+    private Class type;
 
     /**
      * Constructs a Method object.
      *
-     * @param id    - PrimusObject id.
-     * @param args  - Method arguments.
-     * @param value - Method script.
+     * @param id   - PrimusObject id.
+     * @param args - Method arguments.
+     * @param code - Method script.
      */
-    public Method(String id, PrimusObject[] args, String value) {
-        super(id, value);
-        this.args = new PrimusObject[args.length];
+    public Method(String id, Class type, String args[], String code) {
+        super(id, code);
+//        if (!PrimusUtils.isPrimusObjectClass(type))
+//            throw new IllegalArgumentException("Invalid method type: " + type.toString());
+
+        this.type = type;
+        this.args = new String[args.length];
         System.arraycopy(args, 0, this.args, 0, args.length);
     }
 
@@ -29,16 +41,22 @@ public class Method extends PrimusObject {
      */
     public Method(Method clone) {
         super(clone);
-        this.args = new PrimusObject[clone.args.length];
+
+        this.type = clone.type;
+        this.args = new String[clone.args.length];
         System.arraycopy(clone.args, 0, this.args, 0, args.length);
     }
 
-    public PrimusObject[] getArgs() {
+    public String[] getArgs() {
         return args;
     }
 
-    public void setArgs(PrimusObject[] args) {
+    public void setArgs(String[] args) {
         System.arraycopy(args, 0, this.args, 0, args.length);
+    }
+
+    public Class getType() {
+        return type;
     }
 
     /**
@@ -58,8 +76,21 @@ public class Method extends PrimusObject {
         return sb.toString();
     }
 
-    public void runMethod(){
+    /**
+     * Pushes this method's code to the ScriptProcessor
+     */
+    public void runMethod(String[] args) {
+        if (args.length != this.args.length)
+            throw new IllegalArgumentException("Argument mismatch in method: " + getId());
 
+        for (int i = 0; i < args.length; i++) {
+            ExecuteCommand.send(this.args[i] + " = " + args[i], true);
+        }
+
+        System.out.println("Running script:");
+        System.out.println(this.getValue());
+        ScriptProcessor sc = new ScriptProcessor(this.getValue());
+        sc.runScript();
     }
 
     /**
@@ -67,8 +98,10 @@ public class Method extends PrimusObject {
      *
      * @return The string form of this method instance.
      */
-    public String toString(){
+    public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append(this.type.getName());
+        sb.append(" ");
         sb.append(this.getId());
         sb.append("(");
         sb.append(args[0]);
