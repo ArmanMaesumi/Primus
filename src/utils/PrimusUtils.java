@@ -20,6 +20,12 @@ public class PrimusUtils {
         throw new IllegalArgumentException("Invalid method type: " + type);
     }
 
+    public static String getIdFromDefinitionStatement(String s){
+        if (!s.startsWith("def"))
+            return s;
+        return s.substring(s.indexOf(" "), s.indexOf("=")).trim();
+    }
+
     public static boolean isPrimusObjectClass(Class c) {
         return PrimusObject.class.isAssignableFrom(c.getClass());
     }

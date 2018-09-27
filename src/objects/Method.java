@@ -5,6 +5,8 @@ import logic.ExecuteCommand;
 import scripteditor.ScriptProcessor;
 import utils.PrimusUtils;
 
+import java.util.ArrayList;
+
 /**
  * PrimusObject Method class.
  * Used in the form test(defVar x, defFunction f)
@@ -83,14 +85,22 @@ public class Method extends PrimusObject {
         if (args.length != this.args.length)
             throw new IllegalArgumentException("Argument mismatch in method: " + getId());
 
+        // Create argument variables:
         for (int i = 0; i < args.length; i++) {
-            ExecuteCommand.send(this.args[i] + " = " + args[i], true);
+            String defStatement = this.args[i] + " = " + args[i];
+            ExecuteCommand.send(defStatement, true);
         }
 
-        System.out.println("Running script:");
-        System.out.println(this.getValue());
+        // Run script in method:
         ScriptProcessor sc = new ScriptProcessor(this.getValue());
         sc.runScript();
+
+        // Delete argument variables:
+        for (String arg : this.args) {
+            System.out.println("arg:" + arg);
+            String id = PrimusUtils.getIdFromDefinitionStatement(arg + "=");
+            Database.getDatabase().removePrimusObjectById(id);
+        }
     }
 
     /**
