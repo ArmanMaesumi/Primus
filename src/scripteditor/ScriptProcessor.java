@@ -5,15 +5,16 @@ import javafx.application.Platform;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextArea;
 import logic.ExecuteCommand;
+import logic.Parser;
 import objects.Method;
-import objects.PrimusObject;
-import objects.Variable;
 import utils.PrimusUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
+/**
+ * Analyzes and executes Primus scripts.
+ */
 public class ScriptProcessor {
 
     public static TextArea in;
@@ -26,13 +27,19 @@ public class ScriptProcessor {
 
     private Method[] methods;
 
-    public ScriptProcessor(String code){
+    public ScriptProcessor(String code) {
         this.code = code;
         init();
     }
 
+    /**
+     * Initializes important attributes before running the srcipt.
+     */
     private void init() {
+        // Split code by line-by-line.
         this.lines = code.split("\n");
+
+        // Keep track of tabs used in each line.
         this.tabs = new int[lines.length];
 
         int i = 0;
@@ -41,9 +48,14 @@ public class ScriptProcessor {
             i++;
         }
 
+        // Pre-parse all methods in this script.
         parseMethods();
     }
 
+    /**
+     * Finds all methods in this script. Used as a pre-pass before running script.
+     * Stores methods in Database singleton.
+     */
     private void parseMethods() {
         int methodNum = 0;
         ArrayList<Integer> methodLines = new ArrayList<>();
@@ -90,24 +102,32 @@ public class ScriptProcessor {
         }
     }
 
-    public void runScript() {
+    /**
+     * Executes this script.
+     */
+    public String runScript() {
+        for (Method method : methods) {
+            if (method.getId().equals("main")) {
+                method.runMethod(new String[]{""});
+            }
+        }
         int lineNum = 0;
-        //int maxTab = Integer.MAX_VALUE;
         int maxTab = 0;
-        String ret;
+        String scriptReturn = "";
+        String lineReturn;
         for (String line : lines) {
             line = line.trim();
 
             if (maxTab >= tabs[lineNum]) {
-                if (line.startsWith("method")) {
+                if (line.startsWith("return")) {
+                    scriptReturn = Parser.eval(PrimusUtils.afterFirstSpace(line)).toPlainString();
+                } else if (line.startsWith("method")) {
 
                 } else if (line.startsWith("if")) {
-                    ret = ExecuteCommand.send(line, false);
-                    if (ret.equals("true")) {
-                        //maxTab = Integer.MAX_VALUE;
+                    lineReturn = ExecuteCommand.send(line, false);
+                    if (lineReturn.equals("true")) {
                         maxTab++;
                     } else {
-                        //maxTab = tabs[lineNum];
                         maxTab = maxTab > 0 ? --maxTab : 0;
                     }
                 } else if (line.startsWith("for")) {
@@ -142,9 +162,9 @@ public class ScriptProcessor {
                     maxTab = tabs[lineNum];
                 } else {
                     maxTab = tabs[lineNum];
-                    ret = ExecuteCommand.send(line, false);
-                    if (!PrimusUtils.isSuppressed(ret) && !PrimusUtils.isBlank(ret)) {
-                        String finalRet = ret;
+                    lineReturn = ExecuteCommand.send(line, false);
+                    if (!PrimusUtils.isSuppressed(lineReturn) && !PrimusUtils.isBlank(lineReturn)) {
+                        String finalRet = lineReturn;
                         Platform.runLater(() -> out.appendText(finalRet + "\n"));
                     }
                 }
@@ -152,6 +172,8 @@ public class ScriptProcessor {
 
             lineNum++;
         }
+
+        return scriptReturn;
     }
 
     /**

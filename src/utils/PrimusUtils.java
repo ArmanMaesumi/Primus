@@ -50,6 +50,10 @@ public class PrimusUtils {
         return s.substring(s.indexOf("=") + 1, s.length());
     }
 
+    public static String afterFirstSpace(String s){
+        return s.substring(s.indexOf(" ") + 1, s.length());
+    }
+
     public static boolean isSuppressed(String s) {
         return s.startsWith("@");
     }
@@ -97,10 +101,12 @@ public class PrimusUtils {
         return argArr;
     }
 
-
     // input: func(a, b, c)
     public static String getFunctionId(String s) {
+        if (!s.contains("("))
+            return "";
         s = s.trim();
+        System.out.println("xd"+s);
         return s.substring(0, s.indexOf("("));
     }
 

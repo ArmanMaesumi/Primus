@@ -81,19 +81,23 @@ public class Method extends PrimusObject {
     /**
      * Pushes this method's code to the ScriptProcessor
      */
-    public void runMethod(String[] args) {
+    public String runMethod(String[] args) {
         if (args.length != this.args.length)
             throw new IllegalArgumentException("Argument mismatch in method: " + getId());
 
-        // Create argument variables:
-        for (int i = 0; i < args.length; i++) {
-            String defStatement = this.args[i] + " = " + args[i];
-            ExecuteCommand.send(defStatement, true);
+        String ret = "";
+
+        // If this method has arguments, then create argument variables:
+        if (args.length >= 1 && !args[0].trim().equals("")) {
+            for (int i = 0; i < args.length; i++) {
+                String defStatement = this.args[i] + " = " + args[i];
+                ExecuteCommand.send(defStatement, true);
+            }
         }
 
         // Run script in method:
         ScriptProcessor sc = new ScriptProcessor(this.getValue());
-        sc.runScript();
+        ret = sc.runScript();
 
         // Delete argument variables:
         for (String arg : this.args) {
@@ -101,6 +105,8 @@ public class Method extends PrimusObject {
             String id = PrimusUtils.getIdFromDefinitionStatement(arg + "=");
             Database.getDatabase().removePrimusObjectById(id);
         }
+
+        return ret;
     }
 
     /**

@@ -105,7 +105,7 @@ public class ExecuteCommand {
 
     private static boolean runVoidMethod(String input) {
         boolean ran = false;
-        System.out.println("input:"+input);
+        System.out.println("inputvoidmethod:"+input);
         Database db = Database.getDatabase();
         String methodId = PrimusUtils.getFunctionId(input);
         PrimusObject method = db.getPrimusObjectById(methodId);

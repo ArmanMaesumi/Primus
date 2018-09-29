@@ -41,6 +41,17 @@ public class Parser {
                 return false;
             }
 
+            void eatArguments(){
+                int parentheses = 1;
+                while (parentheses > 0) {
+                    nextChar();
+                    if (ch == '(')
+                        parentheses++;
+                    else if (ch == ')')
+                        parentheses--;
+                }
+            }
+
             BigDecimal parse() {
                 System.out.println("Original input: " + str);
                 nextChar();
@@ -131,15 +142,7 @@ public class Parser {
                             x = new BigDecimal(db.getValueOfObjectById(func));
                         } else if (obj.getClass() == Function.class) {
                             startPos = this.pos;
-                            int parentheses = 1;
-                            while (parentheses > 0) {
-                                nextChar();
-                                if (ch == '(')
-                                    parentheses++;
-                                else if (ch == ')')
-                                    parentheses--;
-                            }
-                            //while (ch != ')') nextChar();
+                            eatArguments();
                             if (func.equals("eval")) {
                                 obj.setValue(str.substring(startPos + 1, this.pos));
                                 x = ((Function) obj).eval(new String[1]);
@@ -156,7 +159,15 @@ public class Parser {
                             }
                             eat(')');
                         } else if (obj.getClass() == Method.class){
+                            startPos = this.pos;
+                            eatArguments();
 
+                            String arg = "(" + str.substring(startPos + 1, this.pos) + ")";
+                            String[] argArr = PrimusUtils.getFunctionArgs2(arg);
+                            String methodRet = ((Method) obj).runMethod(argArr);
+                            x = new BigDecimal(methodRet);
+
+                            eat(')');
                         }
                     } else {
                         x = parseFactor();
