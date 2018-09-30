@@ -17,9 +17,6 @@ public class Main extends Application {
         ScreenController sc = ScreenController.getScreenController();
         Database.getDatabase().populateDefaultDefinitions();
         Parent root = FXMLLoader.load(getClass().getResource("Console.fxml"));
-//        primaryStage.setTitle("Primus");
-//        primaryStage.setScene(new Scene(root, 600, 400));
-        //primaryStage.show();
         Scene scene = new Scene(root, 600, 400);
         primaryStage.setScene(scene);
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/images/Logo2.png")));

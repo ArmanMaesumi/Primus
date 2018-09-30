@@ -76,6 +76,7 @@ public class ScriptProcessor {
 
             String methodId = PrimusUtils.getFunctionId(methodLineSplit[2]);
             Class methodType = PrimusUtils.getClassFromType(methodLineSplit[1]);
+
             String[] args = PrimusUtils.getFunctionArgs2(methodLine);
             System.out.println("input to method:" + Arrays.toString(args));
             StringBuilder methodCode = new StringBuilder();
@@ -106,74 +107,79 @@ public class ScriptProcessor {
      * Executes this script.
      */
     public String runScript() {
+        boolean runMainMethod = false;
         for (Method method : methods) {
             if (method.getId().equals("main")) {
+                runMainMethod = true;
                 method.runMethod(new String[]{""});
             }
         }
-        int lineNum = 0;
-        int maxTab = 0;
-        String scriptReturn = "";
-        String lineReturn;
-        for (String line : lines) {
-            line = line.trim();
+        if (!runMainMethod) {
+            int lineNum = 0;
+            int maxTab = 0;
+            String scriptReturn = "0";
+            String lineReturn;
+            for (String line : lines) {
+                line = line.trim();
+                if (maxTab >= tabs[lineNum]) {
+                    if (line.startsWith("return")) {
+                        scriptReturn = Parser.eval(PrimusUtils.afterFirstSpace(line)).toPlainString();
+                        break;
+                    } else if (line.startsWith("method")) {
 
-            if (maxTab >= tabs[lineNum]) {
-                if (line.startsWith("return")) {
-                    scriptReturn = Parser.eval(PrimusUtils.afterFirstSpace(line)).toPlainString();
-                } else if (line.startsWith("method")) {
-
-                } else if (line.startsWith("if")) {
-                    lineReturn = ExecuteCommand.send(line, false);
-                    if (lineReturn.equals("true")) {
-                        maxTab++;
-                    } else {
-                        maxTab = maxTab > 0 ? --maxTab : 0;
-                    }
-                } else if (line.startsWith("for")) {
-                    //for defVar x = 0:condition eval(x<10):operation (x+1)
-                    StringBuilder forCode = new StringBuilder();
-
-                    String[] forLoop = line.split(":");
-                    forLoop[0] = forLoop[0].substring("for ".length(), forLoop[0].length());
-                    ExecuteCommand.send(forLoop[0], true);
-
-                    String varId = forLoop[0].substring("defVar ".length(), forLoop[0].indexOf("="));
-
-                    int forLoopIndent = tabs[lineNum];
-
-                    for (int i = lineNum + 1; i < tabs.length; i++) {
-                        if (tabs[i] > tabs[lineNum]) {
-                            String remove = removeIndents(lines[i], forLoopIndent + 1);
-                            forCode.append(remove);
-                            forCode.append("\n");
+                    } else if (line.startsWith("if")) {
+                        lineReturn = ExecuteCommand.send(line, false);
+                        if (lineReturn.equals("true")) {
+                            maxTab++;
                         } else {
-                            break;
+                            maxTab = maxTab > 0 ? --maxTab : 0;
+                        }
+                    } else if (line.startsWith("for")) {
+                        //for defVar x = 0:condition eval(x<10):operation (x+1)
+                        StringBuilder forCode = new StringBuilder();
+
+                        String[] forLoop = line.split(":");
+                        forLoop[0] = forLoop[0].substring("for ".length(), forLoop[0].length());
+                        ExecuteCommand.send(forLoop[0], true);
+
+                        String varId = forLoop[0].substring("defVar ".length(), forLoop[0].indexOf("="));
+
+                        int forLoopIndent = tabs[lineNum];
+
+                        for (int i = lineNum + 1; i < tabs.length; i++) {
+                            if (tabs[i] > tabs[lineNum]) {
+                                String remove = removeIndents(lines[i], forLoopIndent + 1);
+                                forCode.append(remove);
+                                forCode.append("\n");
+                            } else {
+                                break;
+                            }
+                        }
+                        System.out.println("for code:");
+                        System.out.println(forCode.toString());
+                        ScriptProcessor forScript = new ScriptProcessor(forCode.toString());
+                        while (ExecuteCommand.send("if " + forLoop[1], false).equals("true")) {
+                            forScript.runScript();
+                            ExecuteCommand.send("defVar " + varId + " = " + forLoop[2], true);
+                        }
+
+                        maxTab = tabs[lineNum];
+                    } else {
+                        maxTab = tabs[lineNum];
+                        lineReturn = ExecuteCommand.send(line, false);
+                        if (!PrimusUtils.isSuppressed(lineReturn) && !PrimusUtils.isBlank(lineReturn)) {
+                            String finalRet = lineReturn;
+                            Platform.runLater(() -> out.appendText(finalRet + "\n"));
                         }
                     }
-                    System.out.println("for code:");
-                    System.out.println(forCode.toString());
-                    ScriptProcessor forScript = new ScriptProcessor(forCode.toString());
-                    while (ExecuteCommand.send("if " + forLoop[1], false).equals("true")) {
-                        forScript.runScript();
-                        ExecuteCommand.send("defVar " + varId + " = " + forLoop[2], true);
-                    }
-
-                    maxTab = tabs[lineNum];
-                } else {
-                    maxTab = tabs[lineNum];
-                    lineReturn = ExecuteCommand.send(line, false);
-                    if (!PrimusUtils.isSuppressed(lineReturn) && !PrimusUtils.isBlank(lineReturn)) {
-                        String finalRet = lineReturn;
-                        Platform.runLater(() -> out.appendText(finalRet + "\n"));
-                    }
                 }
+
+                lineNum++;
             }
 
-            lineNum++;
+            return scriptReturn;
         }
-
-        return scriptReturn;
+        return "";
     }
 
     /**

@@ -11,7 +11,8 @@ import java.io.IOException;
 import java.util.Formatter;
 
 /**
- * Created by Arman on 6/4/2015.
+ * Prompts the user with an save file dialog. Used for saving
+ * ".prm" Primus script files.
  */
 class SaveScript {
 

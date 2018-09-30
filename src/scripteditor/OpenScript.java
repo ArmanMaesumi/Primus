@@ -1,17 +1,15 @@
 package scripteditor;
 
-import javafx.fxml.FXML;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 
 /**
- * Created by Arman on 6/4/2015.
+ * Prompts the user with an open file dialog. Used for opening
+ * ".prm" Primus script files.
  */
 public class OpenScript {
 

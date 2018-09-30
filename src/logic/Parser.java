@@ -133,12 +133,9 @@ public class Parser {
                 } else if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) { // functions
                     while ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) nextChar();
                     String func = str.substring(startPos, this.pos);
-                    System.out.println("Func:" + func);
                     if (db.isPrimusObject(func)) {
-                        System.out.println(func + " is a primus object");
                         PrimusObject obj = db.getPrimusObjectById(func);
                         if (obj instanceof Variable) {
-                            System.out.println(func + " is a primus variable");
                             x = new BigDecimal(db.getValueOfObjectById(func));
                         } else if (obj.getClass() == Function.class) {
                             startPos = this.pos;
@@ -171,7 +168,6 @@ public class Parser {
                         }
                     } else {
                         x = parseFactor();
-                        System.out.println("Factor:" + x.toPlainString());
                         if (func.equals("sqrt")) x = BigDecimalMath.sqrt(x, mc);
                         else if (func.equals("sin")) x = new BigDecimal(Math.sin(x.doubleValue()), mc);
                         else if (func.equals("cos")) x = new BigDecimal(Math.cos(x.doubleValue()), mc);
