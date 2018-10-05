@@ -85,11 +85,12 @@ public class Method extends PrimusObject {
         if (args.length != this.args.length)
             throw new IllegalArgumentException("Argument mismatch in method: " + getId());
 
-        String ret = "";
-
         // If this method has arguments, then create argument variables:
+        Database db = Database.getDatabase();
+
         if (args.length >= 1 && !args[0].trim().equals("")) {
             for (int i = 0; i < args.length; i++) {
+                //TODO: make this work for function input.
                 String defStatement = this.args[i] + " = " + args[i];
                 ExecuteCommand.send(defStatement, true);
             }
@@ -97,7 +98,7 @@ public class Method extends PrimusObject {
 
         // Run script in method:
         ScriptProcessor sc = new ScriptProcessor(this.getValue());
-        ret = sc.runScript();
+        String ret = sc.runScript();
 
         // Delete argument variables:
         for (String arg : this.args) {

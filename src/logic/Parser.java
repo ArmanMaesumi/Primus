@@ -9,6 +9,7 @@ import objects.Variable;
 import org.nevec.rjm.BigDecimalMath;
 import org.nevec.rjm.Factorial;
 import org.nevec.rjm.Prime;
+import org.nevec.rjm.Rational;
 import utils.PrimusUtils;
 
 import java.math.BigDecimal;
@@ -186,7 +187,7 @@ public class Parser {
                 }
 
                 if (eat('^'))
-                    x = BigFunctions.exp(BigFunctions.ln(x, 10).multiply(parseFactor()), 10); // exponentiation
+                    x = BigFunctions.exp(BigFunctions.ln(x, 10).multiply(parseFactor()), 10).round(new MathContext(10)); // exponentiation
 
                 return x;
             }

@@ -98,7 +98,7 @@ public class ScriptProcessor {
                     methodCode.toString());
 
             Database.getDatabase().defineMethod(methodId, methodType, args, methodCode.toString());
-            Database.getDatabase().getDefs().add(methods[i]);
+            //Database.getDatabase().getDefs().add(methods[i]);
             System.out.println(methods[i].toString());
         }
     }
