@@ -5,7 +5,11 @@ import objects.Method;
 import objects.PrimusObject;
 import utils.PrimusUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class that handles input Primus input commands.
@@ -61,6 +65,10 @@ public class ExecuteCommand {
                 case "defs":
                     ret = db.getDefs().toString();
                     break;
+                case "print":
+                    String arg = PrimusUtils.afterFirstSpace(input);
+                    ret = print(arg);
+                    break;
                 default:
                     ret = additionalCommands(input);
                     //ret = "Command not recognized: " + input;
@@ -75,6 +83,26 @@ public class ExecuteCommand {
         if (suppress && !PrimusUtils.isErrorMessage(ret))
             ret = "";
         return ret;
+    }
+
+    private static String print(String arg) {
+        Pattern pattern = Pattern.compile("\"([^\"]*)\"");
+        Matcher quoteMatcher = pattern.matcher(arg);
+
+        List<String> quotedText = new ArrayList<>();
+        List<String> unquotedText = new ArrayList<>();
+        String unquotedArgument = arg;
+
+        while (quoteMatcher.find()){
+            String match = quoteMatcher.group(1);
+            quotedText.add(match);
+            unquotedArgument = unquotedArgument.replace("\""+match+"\"", "");
+        }
+
+        System.out.println(quotedText.toString());
+        System.out.println(unquotedArgument);
+
+        return "";
     }
 
     private static String additionalCommands(String input) {
