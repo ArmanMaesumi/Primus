@@ -42,7 +42,7 @@ public class Parser {
                 return false;
             }
 
-            void eatArguments(){
+            void eatArguments() {
                 int parentheses = 1;
                 while (parentheses > 0) {
                     nextChar();
@@ -156,7 +156,7 @@ public class Parser {
                                 x = ((Function) obj).eval(argValues);
                             }
                             eat(')');
-                        } else if (obj.getClass() == Method.class){
+                        } else if (obj.getClass() == Method.class) {
                             startPos = this.pos;
                             eatArguments();
 
@@ -186,12 +186,26 @@ public class Parser {
                     throw new RuntimeException("Unexpected: " + (char) ch);
                 }
 
-                if (eat('^'))
-                    x = BigFunctions.exp(BigFunctions.ln(x, 10).multiply(parseFactor()), 10).round(new MathContext(10)); // exponentiation
+                if (eat('^')) {
+                    BigDecimal power = parseFactor();
+                    System.out.println("power: " + power.toString());
+                    if (isIntegerValue(power)) {
+                        BigDecimal base = new BigDecimal(x.toPlainString());
+                        for (BigDecimal i = BigDecimal.ONE; i.compareTo(power) < 0; i = i.add(BigDecimal.ONE)){
+                            x = x.multiply(base);
+                        }
+                    } else {
+                        x = BigFunctions.exp(BigFunctions.ln(x, 10).multiply(power), 10).round(new MathContext(10)); // exponentiation
+                    }
+                }
 
                 return x;
             }
         }.parse();
+    }
+
+    private static boolean isIntegerValue(BigDecimal bd) {
+        return bd.stripTrailingZeros().scale() <= 0;
     }
 }
 
