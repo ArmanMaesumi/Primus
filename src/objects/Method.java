@@ -6,6 +6,7 @@ import scripteditor.ScriptProcessor;
 import utils.PrimusUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * PrimusObject Method class.
@@ -15,6 +16,7 @@ public class Method extends PrimusObject {
 
     // Method Arguments
     private String[] args;
+    private Class[] argTypes;
 
     // Return type
     private Class type;
@@ -32,8 +34,20 @@ public class Method extends PrimusObject {
 //            throw new IllegalArgumentException("Invalid method type: " + type.toString());
 
         this.type = type;
+        this.argTypes = new Class[args.length];
         this.args = new String[args.length];
         System.arraycopy(args, 0, this.args, 0, args.length);
+        System.out.println(args.length);
+        System.out.println(Arrays.toString(args));
+        for (int i = 0; i < args.length; i++) {
+            if (!PrimusUtils.isBlank(args[i])) {
+                System.out.println(i + " , " + args[i]);
+                Class argType = PrimusUtils.getClassFromDefinitionStatement(args[i]);
+                argTypes[i] = argType;
+            }
+        }
+
+        System.out.println("Arg types: " + Arrays.toString(argTypes));
     }
 
     /**
@@ -42,11 +56,10 @@ public class Method extends PrimusObject {
      * @param clone - Method to clone from.
      */
     public Method(Method clone) {
-        super(clone);
-
-        this.type = clone.type;
-        this.args = new String[clone.args.length];
-        System.arraycopy(clone.args, 0, this.args, 0, args.length);
+        this(clone.getId(),
+                clone.getType(),
+                clone.getArgs(),
+                clone.getValue());
     }
 
     public String[] getArgs() {
@@ -90,8 +103,19 @@ public class Method extends PrimusObject {
 
         if (args.length >= 1 && !args[0].trim().equals("")) {
             for (int i = 0; i < args.length; i++) {
-                //TODO: make this work for function input.
-                String defStatement = this.args[i] + " = " + args[i];
+                String funcVal = null;
+                if (argTypes[i] == Function.class) {
+                    PrimusObject func = db.getPrimusObjectById(args[i]);
+                    if (func != null)
+                        funcVal = func.getValue();
+                }
+
+                String defStatement;
+                if (funcVal != null)
+                    defStatement = this.args[i] + " = " + funcVal;
+                else
+                    defStatement = this.args[i] + " = " + args[i];
+
                 ExecuteCommand.send(defStatement, true);
             }
         }

@@ -5,6 +5,7 @@ import objects.Method;
 import objects.PrimusObject;
 import utils.PrimusUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,6 +44,17 @@ public class ExecuteCommand {
         // Process command:
         try {
             switch (command[0]) {
+                case "import":
+                    if (!command[1].endsWith(".prm"))
+                        command[1] += ".prm";
+
+                    String appPath = System.getProperty("user.dir");
+                    File primusDir = new File(appPath).getParentFile();
+                    File packageDir = new File(primusDir.getAbsoluteFile() + "\\packages\\"+command[1]);
+                    db.getPackages().add(packageDir);
+                    System.out.println(packageDir);
+                    System.out.println(db.getPackages());
+                    break;
                 case "solve":
                 case "eval":
                     String exp = input.substring(input.indexOf(' '), input.length());
@@ -63,7 +75,7 @@ public class ExecuteCommand {
                     ret = String.valueOf(BooleanParser.eval(exp));
                     break;
                 case "defs":
-                    ret = db.getDefs().toString();
+                    ret = db.defsAsString();
                     break;
                 case "print":
                     String arg = PrimusUtils.afterFirstSpace(input);

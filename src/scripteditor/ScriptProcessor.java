@@ -9,8 +9,12 @@ import logic.Parser;
 import objects.Method;
 import utils.PrimusUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * Analyzes and executes Primus scripts.
@@ -36,6 +40,8 @@ public class ScriptProcessor {
      * Initializes important attributes before running the srcipt.
      */
     private void init() {
+        appendPackages();
+
         // Split code by line-by-line.
         this.lines = code.split("\n");
 
@@ -50,6 +56,21 @@ public class ScriptProcessor {
 
         // Pre-parse all methods in this script.
         parseMethods();
+    }
+
+    private void appendPackages() {
+        HashSet<File> packages = Database.getDatabase().getPackages();
+        for (File pckg : packages) {
+            try {
+                String pckgCode = new String(Files.readAllBytes(pckg.toPath()));
+                code += "\n";
+                code += pckgCode;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println(code);
     }
 
     /**
@@ -129,11 +150,8 @@ public class ScriptProcessor {
 
                     } else if (line.startsWith("if")) {
                         lineReturn = ExecuteCommand.send(line, false);
-                        if (lineReturn.equals("true")) {
-                            maxTab++;
-                        } else {
-                            maxTab = maxTab > 0 ? --maxTab : 0;
-                        }
+                        if (lineReturn.equals("true")) maxTab++;
+                        else maxTab = maxTab > 0 ? --maxTab : 0;
                     } else if (line.startsWith("for")) {
                         //for defVar x = 0:condition eval(x<10):operation (x+1)
                         StringBuilder forCode = new StringBuilder();

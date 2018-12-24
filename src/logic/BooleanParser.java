@@ -14,15 +14,15 @@ public class BooleanParser {
 
     public static boolean eval(final String str) {
         return new Object() {
-            int pos = -1, ch;
+            private int pos = -1, ch;
             Prime prime = new Prime();
-            Database db = Database.getDatabase();
+            private Database db = Database.getDatabase();
 
-            void nextChar() {
+            private void nextChar() {
                 ch = (++pos < str.length()) ? str.charAt(pos) : -1;
             }
 
-            boolean eat(int charToEat) {
+            private boolean eat(int charToEat) {
                 while (ch == ' ') nextChar();
                 if (ch == charToEat) {
                     nextChar();
@@ -31,7 +31,7 @@ public class BooleanParser {
                 return false;
             }
 
-            boolean parse() {
+            private boolean parse() {
                 System.out.println("Original input: " + str);
                 nextChar();
                 boolean b = parseExpression();
@@ -41,7 +41,7 @@ public class BooleanParser {
                 return b;
             }
 
-            boolean parseExpression() {
+            private boolean parseExpression() {
                 boolean b = parseTerm();
                 for (; ; ) {
                     if (eat('&')) b = b & parseFactor();
@@ -50,7 +50,7 @@ public class BooleanParser {
                 }
             }
 
-            boolean parseTerm() {
+            private boolean parseTerm() {
                 boolean b = parseFactor();
                 for (; ; ) {
                     if (eat('<')) ;
@@ -59,7 +59,7 @@ public class BooleanParser {
                 }
             }
 
-            boolean parseFactor() {
+            private boolean parseFactor() {
                 if (eat('!')) return !parseFactor(); // unary minus
 
                 boolean b = false;

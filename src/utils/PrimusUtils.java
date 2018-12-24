@@ -9,6 +9,16 @@ public class PrimusUtils {
 
     public static final String SET_SYNTAX = ":=";
 
+    public static Class getClassFromDefinitionStatement(String def) {
+        def = def.trim();
+        if (def.startsWith("defVar"))
+            return Variable.class;
+        else if (def.startsWith("defFunc"))
+            return Function.class;
+
+        throw new IllegalArgumentException("Invalid argument type: " + def);
+    }
+
     public static Class getClassFromType(String type) {
         if (type.equals("var"))
             return Variable.class;

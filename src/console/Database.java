@@ -3,11 +3,13 @@ package console;
 import logic.Parser;
 import objects.*;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
 
 /**
- * Singleton Database class for global access to user defined PrimusObjects.
+ * Singleton Database class for global access to user defined PrimusObjects, as well as predefined
+ * Primus functions such as sin, cos, sqrt, log, etc.
  */
 public class Database {
 
@@ -15,8 +17,8 @@ public class Database {
     private static Database db;
     private boolean init;
 
-    // ArrayList of user defined PrimusObjects and Primus constants
-    private ArrayList<PrimusObject> defs = new ArrayList<>();
+    // Maps of user defined PrimusObjects and Primus constants
+    private Map<String, PrimusObject> defs = new HashMap<>();
     private static final Map<String, BigDecimal> constants = new HashMap<String, BigDecimal>() {{
         put("pi", new BigDecimal("3.1415926535897932384626433832795028841971693993751058209749"));
         put("e", new BigDecimal("2.718281828459045235360287471352662497757247093699959574966"));
@@ -28,14 +30,31 @@ public class Database {
     private Function evalFunction;
 
     // Reserved Primus keywords
-    private static final String[] RESERVED_KEYWORDS =
-            {"sqrt", "sin", "cos", "tan", "ln", "log", "abs", "fact", "factorial", "isPrime", "eval",
-                    "true", "false", "sigma"};
+    private static final HashSet<String> RESERVED = new HashSet<String>(){{
+        add("sqrt");
+        add("sin");
+        add("cos");
+        add("tan");
+        add("ln");
+        add("log");
+        add("abs");
+        add("fact");
+        add("factorial");
+        add("isPrime");
+        add("eval");
+        add("true");
+        add("false");
+        add("sum");
+    }};
+
+    // Imported packages:
+    private HashSet<File> packages = new HashSet<File>();
 
     // Singleton constructor
     private Database() {
 
     }
+
 
     /**
      * Creates an instance of this singleton Database class. If it already is instantiated,
@@ -49,12 +68,14 @@ public class Database {
         return db;
     }
 
+
     /**
      * @return ArrayList of user defined Primus Objects, and Primus constants.
      */
-    public ArrayList<PrimusObject> getDefs() {
+    public Map<String, PrimusObject> getDefs() {
         return defs;
     }
+
 
     /**
      * Clears user defined Primus Objects, and retains Primus constants.
@@ -65,6 +86,7 @@ public class Database {
         populateDefaultDefinitions();
     }
 
+
     /**
      * Populates Primus constants if they are not already initialized.
      */
@@ -72,14 +94,17 @@ public class Database {
         if (init)
             return;
 
-        for (Map.Entry<String, BigDecimal> entry : constants.entrySet()) {
-            defineReservedTerm(entry.getKey(), entry.getValue().toPlainString());
+        for (String constant : constants.keySet()) {
+            BigDecimal bd = constants.get(constant);
+            defineReservedVariable(constant, bd.toPlainString());
         }
+
         evalFunction = new Function("eval", new String[1], "");
-        defs.add(evalFunction);
+        defs.put(evalFunction.getId(), evalFunction);
 
         init = true;
     }
+
 
     /**
      * Global evaluation function.
@@ -93,17 +118,15 @@ public class Database {
         return evalFunction.eval(new String[1]);
     }
 
+
     /**
      * @param id - id of target Primus Object.
      * @return PrimusObject with id, null if Primus Object is not defined.
      */
     public PrimusObject getPrimusObjectById(String id) {
-        for (PrimusObject o : defs) {
-            if (o.getId().equals(id))
-                return o;
-        }
-        return null;
+        return defs.get(id);
     }
+
 
     /**
      * @param id - id of target Primus Object.
@@ -116,6 +139,7 @@ public class Database {
         throw new IllegalArgumentException("PrimusObject not found: " + id);
     }
 
+
     /**
      * @param id - id of target Primus Object.
      * @return if any Primus Object has id.
@@ -125,42 +149,36 @@ public class Database {
         return o != null;
     }
 
+
     /**
      * Removes Primus Object from defs ArrayList.
      * preconditions: Primus Object with id is defined.
      *
      * @param id - id of target Primus Object.
      */
-    public void removePrimusObjectById(String id) {
-        PrimusObject o = getPrimusObjectById(id);
-        if (o != null)
-            defs.remove(o);
+    public PrimusObject removePrimusObjectById(String id) {
+        return defs.remove(id);
     }
 
-    /**
-     * @param id - id of target Primus Object.
-     * @return index of Primus Object with id in defs ArrayList.
-     */
-    public int getIndexOfPrimusObjectById(String id) {
-        for (int i = 0; i < defs.size(); i++) {
-            if (defs.get(i).getId().equals(id))
-                return i;
-        }
-        return -1;
-    }
 
     /**
      * Removes all expired TemporaryVariables from defs ArrayList.
+     * @return if any variables were removed
      */
-    public void removeExpiredTemporaryVariables() {
-        Iterator<PrimusObject> i = defs.iterator();
-        while (i.hasNext()) {
-            PrimusObject o = i.next();
+    public boolean removeExpiredTemporaryVariables() {
+        boolean ret = false;
+
+        for (String objId : defs.keySet()) {
+            PrimusObject o = defs.get(objId);
             if (o.getClass() == TemporaryVariable.class) {
-                if (((TemporaryVariable) o).isExpired())
-                    defs.remove(o);
+                if (((TemporaryVariable) o).isExpired()) {
+                    defs.remove(objId);
+                    ret = true;
+                }
             }
         }
+
+        return ret;
     }
 
 
@@ -169,12 +187,9 @@ public class Database {
      * @return if keyword is reserved by Primus.
      */
     public boolean isReserved(String s) {
-        for (String keyword : RESERVED_KEYWORDS) {
-            if (keyword.equals(s))
-                return true;
-        }
-        return false;
+        return RESERVED.contains(s);
     }
+
 
     /**
      * Allows Primus to created Primus Variables with keyword restricted names.
@@ -182,18 +197,19 @@ public class Database {
      * @param id  - Variable id.
      * @param val - Variable expression.
      */
-    private void defineReservedTerm(String id, String val) {
+    private void defineReservedVariable(String id, String val) {
         if (val.trim().equals(""))
             throw new IllegalArgumentException("Invalid expression in variable " + id);
         // Compute new value before deleting old value.
         // Reason: defVar x = x + 1
         BigDecimal newVal = Parser.eval(val);
-        removePrimusObjectById(id);
-        defs.add(new Variable(id, newVal));
+        defs.put(id, new Variable(id, newVal));
     }
+
 
     /**
      * Creates a Primus Variable.
+     *
      *
      * @param id  - Variable id.
      * @param val - Variable expression.
@@ -207,8 +223,9 @@ public class Database {
         // Reason: defVar x = x + 1
         BigDecimal newVal = Parser.eval(val);
         removePrimusObjectById(id);
-        defs.add(new Variable(id, newVal));
+        defs.put(id, new Variable(id, newVal));
     }
+
 
     /**
      * Creates a Primus Function.
@@ -229,8 +246,9 @@ public class Database {
 
         // Remove and replace if Function already exists.
         removePrimusObjectById(id);
-        defs.add(new Function(id, args, exp));
+        defs.put(id, new Function(id, args, exp));
     }
+
 
     /**
      * Creates a Primus Method.
@@ -242,12 +260,13 @@ public class Database {
      */
     public void defineMethod(String id, Class type, String[] args, String code) {
         removePrimusObjectById(id);
-        defs.add(new Method(
+        defs.put(id, new Method(
                 id,
                 type,
                 args,
                 code));
     }
+
 
     /**
      * Creates a Primus Temporary Variable.
@@ -262,8 +281,7 @@ public class Database {
         // Compute new value before deleting old value.
         // Reason: defVar x = x + 1
         BigDecimal newVal = Parser.eval(val);
-        removePrimusObjectById(id);
-        defs.add(new TemporaryVariable(id, newVal));
+        defs.put(id, new TemporaryVariable(id, newVal));
     }
 
 
@@ -275,7 +293,7 @@ public class Database {
     public void addAllPrimusObjects(ArrayList<PrimusObject> coll) {
         for (PrimusObject o : coll) {
             removePrimusObjectById(o.getId());
-            defs.add(o);
+            defs.put(o.getId(), o);
         }
     }
 
@@ -289,5 +307,34 @@ public class Database {
         for (PrimusObject o : coll) {
             removePrimusObjectById(o.getId());
         }
+    }
+
+
+    /**
+     * @return The set of imported packages.
+     */
+    public HashSet<File> getPackages() {
+        return packages;
+    }
+
+
+    /**
+     * @return A formatted string of user defined PrimusObjects.
+     */
+    public String defsAsString() {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+
+        sb.append("[");
+        for (String def : defs.keySet()) {
+            if (!first) sb.append(", ");
+            else first = false;
+
+            PrimusObject obj = defs.get(def);
+            sb.append(obj.toString());
+        }
+        sb.append("]");
+
+        return sb.toString();
     }
 }
