@@ -6,10 +6,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import objects.Function;
-import objects.PrimusObject;
-import objects.Variable;
-import scripteditor.ScriptProcessor;
 
 public class Main extends Application {
     @Override

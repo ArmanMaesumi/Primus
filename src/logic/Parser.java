@@ -23,17 +23,17 @@ public class Parser {
     // Heavily inspired by StackOverflow user Boann:
     public static BigDecimal eval(final String str) {
         return new Object() {
-            private int pos = -1, ch;
-            private Random rand = new Random();
-            private Prime prime = new Prime();
-            private Database db = Database.getDatabase();
-            private MathContext mc = new MathContext(15, RoundingMode.HALF_UP);
+            int pos = -1, ch;
+            Random rand = new Random();
+            Prime prime = new Prime();
+            Database db = Database.getDatabase();
+            MathContext mc = new MathContext(15, RoundingMode.HALF_UP);
 
-            private void nextChar() {
+            void nextChar() {
                 ch = (++pos < str.length()) ? str.charAt(pos) : -1;
             }
 
-            private boolean eat(int charToEat) {
+            boolean eat(int charToEat) {
                 while (ch == ' ') nextChar();
                 if (ch == charToEat) {
                     nextChar();
@@ -53,7 +53,7 @@ public class Parser {
                 }
             }
 
-            private BigDecimal parse() {
+            BigDecimal parse() {
                 System.out.println("Original input: " + str);
                 nextChar();
                 BigDecimal x = parseLogic();
@@ -61,7 +61,7 @@ public class Parser {
                 return x;
             }
 
-            private BigDecimal parseLogic() {
+            BigDecimal parseLogic() {
                 BigDecimal x = parseExpression();
                 for (; ; ) {
                     int startPos = this.pos;
@@ -79,13 +79,13 @@ public class Parser {
                             x = res == 0 ? new BigDecimal("1") : new BigDecimal("0");
                         } else if (operator.equals(">=")) {
                             BigDecimal temp = parseExpression();
-                            if (x.compareTo(temp) >= 0)
+                            if (x.compareTo(temp) > 0 || x.compareTo(temp) == 0)
                                 x = new BigDecimal("1");
                             else
                                 x = new BigDecimal("0");
                         } else if (operator.equals("<=")) {
                             BigDecimal temp = parseExpression();
-                            if (x.compareTo(temp) <= 0)
+                            if (x.compareTo(temp) < 0 || x.compareTo(temp) == 0)
                                 x = new BigDecimal("1");
                             else
                                 x = new BigDecimal("0");
@@ -100,7 +100,7 @@ public class Parser {
                 }
             }
 
-            private BigDecimal parseExpression() {
+            BigDecimal parseExpression() {
                 BigDecimal x = parseTerm();
                 for (; ; ) {
                     if (eat('+')) x = x.add(parseTerm(), mc); // addition
@@ -109,7 +109,7 @@ public class Parser {
                 }
             }
 
-            private BigDecimal parseTerm() {
+            BigDecimal parseTerm() {
                 BigDecimal x = parseFactor();
                 for (; ; ) {
                     if (eat('*')) x = x.multiply(parseFactor(), mc); // multiplication
@@ -119,7 +119,7 @@ public class Parser {
                 }
             }
 
-            private BigDecimal parseFactor() {
+            BigDecimal parseFactor() {
                 if (eat('+')) return parseFactor(); // unary plus
                 if (eat('-')) return parseFactor().negate(); // unary minus
 
@@ -156,7 +156,7 @@ public class Parser {
                                 x = ((Function) obj).eval(argValues);
                             }
                             eat(')');
-                        } else if (obj.getClass() == Method.class) {
+                        } else if (obj.getClass() == Method.class){
                             startPos = this.pos;
                             eatArguments();
 
@@ -187,11 +187,16 @@ public class Parser {
                 }
 
                 if (eat('^')) {
-                    if (x.equals(BigDecimal.ZERO))
-                        parseFactor();
-                    else
-                        x = BigFunctions.exp(BigFunctions.ln(x, 10).multiply(parseFactor()), 10).
-                                round(new MathContext(10)); // exponentiation
+                    BigDecimal power = parseFactor();
+                    System.out.println("power: " + power.toString());
+                    if (isIntegerValue(power)) {
+                        BigDecimal base = new BigDecimal(x.toPlainString());
+                        for (BigDecimal i = BigDecimal.ONE; i.compareTo(power) < 0; i = i.add(BigDecimal.ONE)){
+                            x = x.multiply(base);
+                        }
+                    } else {
+                        x = BigFunctions.exp(BigFunctions.ln(x, 10).multiply(power), 10).round(new MathContext(10)); // exponentiation
+                    }
                 }
 
                 return x;
@@ -199,3 +204,4 @@ public class Parser {
         }.parse();
     }
 }
+
