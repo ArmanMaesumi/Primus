@@ -8,7 +8,7 @@ Primus is a programmable calculator that supports arbitrary-precision arithmetic
 
 Calculate hypotenuse:
 ```
-method var hypotenuse(defVar a, defVar b)
+method var hypotenuse(var a, var b)
 	return eval(sqrt(a^2 + b^2))
 
 eval hypotenuse(3, 4)
@@ -18,11 +18,11 @@ eval hypotenuse(3, 4)
 
 Approximate integral:
 ```
-method var integral(defFunction f(x), defVar a, defVar b, defVar steps)
-	defVar sum = 0
-	defVar stepSize = steps/(b-a)
-	for defVar i = a:eval(i <= b):i+stepSize
-		defVar sum = sum + (f(i) * stepSize)
+method var integral(function f(x), var a, var b, var steps)
+	var sum = 0
+	var stepSize = steps/(b-a)
+	for var i = a:eval(i <= b):i+stepSize
+		var sum = sum + (f(i) * stepSize)
 	return sum
 
 eval integral(x*x, 0, 10, 0.1)

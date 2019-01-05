@@ -138,7 +138,7 @@ class Permutation implements Cloneable
         } /* length */
 
         /** Produce a "deep" clone of this.
-        * @return a permutation with the same images as this.
+        * @return a permutation with the same arman.edu.utexas.cs.Primus.images as this.
         */
         public Permutation clone()
         {
@@ -169,7 +169,7 @@ class Permutation implements Cloneable
                         throw new IllegalArgumentException("Different permutation lengths " 
                                         + images.length + " vs " + right.images.length) ;
 
-                /* the list of images in the new product
+                /* the list of arman.edu.utexas.cs.Primus.images in the new product
                 */
                 int[] prod = new int[images.length] ;
                 for(int i=0 ; i < images.length ; i++)
@@ -180,7 +180,7 @@ class Permutation implements Cloneable
                         */
                         prod[i] = right.images[images[i]-REPOFFSET] ;
 
-                /* convert the images to a permutation
+                /* convert the arman.edu.utexas.cs.Primus.images to a permutation
                 */
                 return new Permutation(prod) ;
         } /* multiply */
@@ -298,13 +298,13 @@ class Permutation implements Cloneable
                         }
 
                         /* if all the integers have been flagged in the previous loop as accounted for,
-                        * that loop exited with notmoved=images.length and we
+                        * that loop exited with notmoved=arman.edu.utexas.cs.Primus.images.length and we
                         * terminate the loop that lists cycles.
                         */
                         if ( notmoved == images.length)
                                 break;
 
-                        /* list in tracei[] the repeated images of the element notmoved.
+                        /* list in tracei[] the repeated arman.edu.utexas.cs.Primus.images of the element notmoved.
                         */
                         int[] tracei = orbit(notmoved+REPOFFSET) ;
 
@@ -382,7 +382,7 @@ class Permutation implements Cloneable
 
         /** Generate the trace of an integer until the repeated image has closed its cycle.
         * @param s The integer to be traced.
-        * @return a vector [s, images[s], images^2[s]...].
+        * @return a vector [s, arman.edu.utexas.cs.Primus.images[s], arman.edu.utexas.cs.Primus.images^2[s]...].
         *   Fixed elements are not reported at all, so their return vector is empty.
         */
         int[] orbit(final int s)
@@ -422,7 +422,7 @@ class Permutation implements Cloneable
                 return oArr ;
         } /* orbit */
 
-        /** Swap/exchange the images of i and j
+        /** Swap/exchange the arman.edu.utexas.cs.Primus.images of i and j
         * @param i 0-based element in the permutation.
         * @param j 0-based element in the permutation.
         */
@@ -561,7 +561,7 @@ class Permutation implements Cloneable
                 final int m = smallestMoved() ;
                 final int f = largestFixed() ;
                 /* there are three cases: all elements moved where m=0, f=-1,
-                * all elements fixed, where m=images.length, f=images.length-1 and the general case.
+                * all elements fixed, where m=arman.edu.utexas.cs.Primus.images.length, f=arman.edu.utexas.cs.Primus.images.length-1 and the general case.
                 * Well-ordered in the current sense are sensed by the criterion m=f+1.
                 */
                 return ( m == f+1) ? true: false ;
